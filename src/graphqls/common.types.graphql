@@ -1,0 +1,27 @@
+type ReturnPage{
+    #总条数
+    totalItems: Int,
+    #当前页
+    currentPage: Int,
+    #当前页内有多少条数据
+    pageSize: Int,
+    #总页数
+    totalPages: Int,
+    #开始页
+    startPage: Int,
+    #结束页
+    endPage: Int,
+    #开始下标
+    startIndex: Int,
+    #结束下标
+    endIndex: Int,
+    #页码列表
+    pageNumber: [Int]
+}
+type ResultCode{
+    #返回信息
+    message:String,
+    #返回状态码
+    code:Int
+}
+scalar JSON

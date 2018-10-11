@@ -1,0 +1,43 @@
+{
+    "name": "logistics-api",
+    "version": "1.0.0",
+    "description": "The logistics backend project.",
+    "main": "main.ts",
+    "repository": "git@gitee.com:ibenchus/liantuan-backend.git",
+    "author": "lvying",
+    "license": "Apache-2.0",
+    "scripts": {
+        "build": "gulp build",
+        "start": "ts-node -r tsconfig-paths/register src/main.ts",
+        "start:watch": "nodemon",
+        "debug": "node --inspect-brk -r ts-node/register src/main.ts",
+        "debug:watch": "nodemon --config nodemon-debug.json",
+        "check": "tslint -p tsconfig.json -c tslint.json",
+        "fix": "tslint -p tsconfig.json -c tslint.json --fix"
+    },
+    "dependencies": {
+        "@nestjs/common": "^5.3.7",
+        "@nestjs/core": "^5.3.7",
+        "@nestjs/graphql": "^5.3.1",
+        "@nestjs/typeorm": "^5.2.1",
+        "apollo-server-express": "^2.0.7",
+        "graphql": "^14.0.2",
+        "graphql-tools": "^3.1.1",
+        "graphql-type-json": "^0.2.1",
+        "pg": "^7.4.3",
+        "reflect-metadata": "^0.1.12",
+        "rxjs": "^6.3.2",
+        "typeorm": "^0.2.7",
+        "typescript": "^3.0.3",
+        "underscore": "^1.9.1"
+    },
+    "devDependencies": {
+        "@types/graphql": "^14.0.0",
+        "@types/graphql-type-json": "^0.1.2",
+        "@types/node": "^10.9.4",
+        "nodemon": "^1.18.4",
+        "ts-node": "^7.0.1",
+        "tsconfig-paths": "^3.6.0",
+        "tslint": "^5.11.0"
+    }
+}

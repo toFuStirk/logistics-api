@@ -1,0 +1,4 @@
+type Query{
+    # 测试刷新token
+    getToken: String
+}

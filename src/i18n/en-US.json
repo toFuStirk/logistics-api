@@ -1,0 +1,10 @@
+{
+    "The current classification does not exist": "The current classification does not exist",
+    "Article cannot be added under current category": "Article cannot be added under current category",
+    "There are articles under the current category, which cannot be deleted": "There are articles under the current category, which cannot be deleted",
+    "The current parent does not exist": "The current parent does not exist",
+    "Currently specified classes cannot add articles": "Currently specified classes cannot add articles",
+    "Classification aliases cannot be repeated": "Classification aliases cannot be repeated",
+    "Review the success": "Review the success",
+    "Delete the success": "Delete the success"
+}
