@@ -1,0 +1,86 @@
+mutation LabelTheDelivery{
+    LabelTheDelivery(params:{
+        pickupAddress:{
+            name: "Jerry",
+            address1: "DHL Express (M) Sdn. Bhd",
+            city: "Laksi",
+            state: "Laksi",
+            district: "Laksi",
+            country: "TH",
+            postCode: "10010",
+            phone: "15389665241",
+            email: "jerry@dhl.com"
+        },
+        shipperAddress:{
+            name: "Jerry",
+            address1: "DHL Express (M) Sdn. Bhd",
+            city: "Laksi",
+            state: "Laksi",
+            district: "Laksi",
+            country: "TH",
+            postCode: "10010",
+            phone: "15389665241",
+            email: "jerry@dhl.com",
+            sendEmail: "true"
+        },
+        shipmentItems:[{
+            consigneeAddress:{
+                name: "Jerry",
+                address1: "DHL Express (M) Sdn. Bhd",
+                city: "Laksi",
+                state: "PICKUPstate",
+                district: "Laksi",
+                country: "TH",
+                postCode: "10010",
+                phone: "15389665241",
+                email: "jerry@dhl.com",
+                idType: "1",
+                idNumber: "1023"
+            },
+            returnAddress:{
+                companyName: "DHL",
+                name: "Jerry",
+                address1: "DHL Express (M) Sdn. Bhd.",
+                address2: "Menara TM .",
+                city: "Laksi",
+                state: "Laksi",
+                district: "Laksi",
+                country: "TH",
+                postCode: "10010",
+                phone: "123456789",
+                email: "jerry@dhl.com"
+            },
+            shipmentID: "MYBRU15107346524632",
+            deliveryConfirmationNo: "238643",
+            packageDesc: "PKG_desc",
+            totalWeight: 250,
+            totalWeightUOM: "G",
+            dimensionUOM: "cm",
+            height: 120.0,
+            length: 5.0,
+            width: 0.0,
+            productCode: "PDO",
+            currency: "THB",
+            remarks: "remarks to test",
+            valueAddedServices: {
+                valueAddedService: [{
+                    vasCode: "PPOD"
+                }]
+            }
+            isMult: "true",
+            deliveryOption: "p",
+            shipmentPieces: [{
+                pieceID: 11,
+                codAmount: 0.01,
+                billingReference1: "123",
+                billingReference2: "123",
+                pieceDescription: "Device"
+            }],
+        }],
+        label: {
+            pageSize: "400*600",
+            format: "PNG",
+            layout: "1*1"
+        }
+    })
+}

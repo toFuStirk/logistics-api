@@ -1,0 +1,133 @@
+type Mutation{
+    LabelTheDelivery(params:LabelDeliveryInput):String
+}
+type Query{
+    DhlTracking(params:[String]!):String
+}
+input LabelDeliveryInput{
+    pickupAddress:[PickupAddress],
+    shipperAddress: [ShipperAddress],
+    shipmentItems: [ShipmentItems],
+    label:[Label]
+}
+input PickupAddress{
+    companyName: String,
+    name: String!,
+    address1: String!,
+    address2: String,
+    address3: String,
+    city: String!,
+    state: String,
+    district: String,
+    #Pickup Country code (ISO 2-char country code). Refer to Country Codes in the Appendix page
+    country: String!,
+    postCode: String,
+    phone: String,
+    email: String,
+}
+input ShipperAddress{
+    companyName: String,
+    name: String!,
+    address1: String!,
+    address2: String,
+    address3: String,
+    city: String!,
+    state: String,
+    district: String,
+    #Pickup Country code (ISO 2-char country code). Refer to Country Codes in the Appendix page
+    country: String!,
+    postCode: String,
+    phone: String!,
+    #If sendEmail is "true" and productCode is PDR. this field must be provided
+    email: String!,
+    sendEmail: String!
+}
+input ShipmentItems{
+    consigneeAddress: [ConsigneeAddress],
+    returnAddress: [PickupAddress],
+    shipmentID: String,
+    returnMode: String,
+    deliveryConfirmationNo: String,
+    packageDesc: String,
+    totalWeight: Int,
+    totalWeightUOM: String,
+    dimensionUOM: String,
+    height: Float,
+    length: Float,
+    width: Float,
+    customerReference1: String,
+    customerReference2: String,
+    productCode: String,
+    incoterm: String,
+    contentIndicator: String,
+    codValue: String,
+    insuranceValue: Int,
+    freightCharge: Int,
+    totalValue: Int,
+    currency: String,
+    remarks: String,
+    workshareIndicator: String,
+    billingReference1: String,
+    billingReference2: String,
+    deliveryOption: String,
+    isMult: String,
+    invoiceInt: String,
+    invoiceString: String,
+    reverseCharge: String,
+    igstPaymentStatus: String,
+    termsOfInvoice: String,
+    returnProductCode: String,
+    locationID: String,
+    shipmentPieces: [ShipmentPieces],
+    valueAddedServices: [ValueAddedServices]
+}
+input ConsigneeAddress{
+    companyName: String,
+    name: String!,
+    address1: String!,
+    address2: String,
+    address3: String,
+    city: String!,
+    state: String,
+    district: String,
+    #Pickup Country code (ISO 2-char country code). Refer to Country Codes in the Appendix page
+    country: String!,
+    postCode: String,
+    phone: String,
+    email: String,
+    #Consignee Identification Number
+    idNumber: String,
+    #Consignee Identification Type. For possible values, refer to Identification Type in Appendix page.
+    idType: String
+}
+input ShipmentPieces {
+    pieceID: Int,
+    announcedWeight: [AnnouncedWeight],
+    codAmount: Float,
+    insuranceAmount: Float,
+    billingReference1: String,
+    billingReference2: String,
+    pieceDescription: String
+}
+input AnnouncedWeight {
+    weight: Float,
+    unit: String
+}
+input Label {
+    pageSize: String,
+    # 'PNG' | 'ZPL' | 'PDF'
+    format: String!,
+    #  '1x1'|'4x1'
+    layout: String
+}
+input ValueAddedServices{
+    valueAddedService: [ValueAddedService]
+}
+input ValueAddedService{
+    vasCode: String!,
+    attributes: Attributes
+}
+input Attributes{
+    attributeName: String,
+    attributeValue: String
+}

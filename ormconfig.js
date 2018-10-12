@@ -1,13 +1,13 @@
 const SOURCE_PATH = process.env.NODE_ENV === 'development' ? 'packages' : 'src';
 module.exports= {
-  "type": "postgres",
+  "type": "mysql",
   "host": "localhost",
-  "port":  5432,
-  "username": "postgres",
+  "port":  3306,
+  "username": "root",
   "password": "123456",
-  "database": "cms",
+  "database": "dhl",
   "entities": [`**/**.entity{.ts,.js}`],
   "synchronize": true,
-  "logging":true,
+  "logging":false,
     "logger":"simple-console"
 }

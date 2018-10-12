@@ -1,18 +1,18 @@
 // 参数未写完成， valueAddedServices， shipmentContents
-export interface DhlLabelReqBody{
+export interface DhlLabelReqBody {
     customerAccountId: number;
     pickupAccountId: string;
     soldToAccountId: string;
-    pickupDateTime: Date;
-    inlineLabelReturn: "Y"|"N"|"U"|"NULL",
+    pickupDateTime: string;
+    inlineLabelReturn: 'Y'|'N'|'U'|'NULL';
     handoverMethod: number;
-    pickupAddress: [PickupAddress],
+    pickupAddress: [PickupAddress];
     /*如果产品代码是PDR，而shipmentID最初是通过DHL发货，则为可选。*/
-    shipperAddress: [ShipperAddress],
-    shipmentItems: [ShipmentItems],
-    label:[Label]
+    shipperAddress: [ShipperAddress];
+    shipmentItems: [ShipmentItems];
+    label: [Label];
 }
-export interface PickupAddress{
+export interface PickupAddress {
     companyName: string;
     name: string;
     address1: string;
@@ -26,12 +26,12 @@ export interface PickupAddress{
     phone: string;
     email: string;
 }
-export interface ShipperAddress extends PickupAddress{
-    sendEmail: string
+export interface ShipperAddress extends PickupAddress {
+    sendEmail: string;
 }
-export interface ShipmentItems{
-    consigneeAddress: [ConsigneeAddress],
-    returnAddress: [PickupAddress],
+export interface ShipmentItems {
+    consigneeAddress: [ConsigneeAddress];
+    returnAddress: [PickupAddress];
     // 最长32位,90天之内不能重复
     shipmentID: string;
     // 退货指示 仅使用与国内运输
@@ -72,30 +72,38 @@ export interface ShipmentItems{
     termsOfInvoice: string;
     returnProductCode: string;
     locationID: string;
-    shipmentPieces: [ShipmentPieces]
+    shipmentPieces: [ShipmentPieces];
+    valueAddedServices: [ValueAddedServices];
 }
-export interface ConsigneeAddress extends PickupAddress{
+export interface ConsigneeAddress extends PickupAddress {
     // Consignee Identification Number
     idNumber: string;
     // Consignee Identification Type. For possible values, refer to Identification Type in Appendix page.
     idType: string;
 }
-export interface ShipmentPieces{
+export interface ShipmentPieces {
     // 将在提供的发货ID后追加的件号
     pieceID: number;
-    announcedWeight: [AnnouncedWeight],
+    announcedWeight: [AnnouncedWeight];
     codAmount: number;
     insuranceAmount: number;
     billingReference1: string;
     billingReference2: string;
     pieceDescription: string;
 }
-export interface AnnouncedWeight{
+export interface AnnouncedWeight {
     weight: number;
     unit: string;
 }
-export interface Label{
+export interface Label {
     pageSize: string;
-    format: "PNG"|"ZPL"|"PDF",
-    layout: "1x1"|"4x1"
+    format: 'PNG'|'ZPL'|'PDF';
+    layout: '1x1'|'4x1';
+}
+export interface ValueAddedServices {
+    valueAddedService: [ValueAddedService];
+}
+export interface ValueAddedService {
+    vasCode: string;
+    attributes: {attributeName: string, attributeValue: string };
 }

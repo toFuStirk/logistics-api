@@ -1,4 +1,4 @@
-export interface DhlTokenResBody{
+export interface DhlTokenResBody {
     accessTokenResponse: {
         token: string,
         token_type: string,
@@ -9,6 +9,6 @@ export interface DhlTokenResBody{
             message: string,
             messageDetails: string
         }
-    }
+    };
 
 }
