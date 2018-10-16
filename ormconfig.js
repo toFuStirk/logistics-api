@@ -8,6 +8,6 @@ module.exports= {
   "database": "dhl",
   "entities": [`**/**.entity{.ts,.js}`],
   "synchronize": true,
-  "logging":false,
+  "logging":true,
     "logger":"simple-console"
 }

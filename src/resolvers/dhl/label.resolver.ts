@@ -1,5 +1,5 @@
 import {Resolver, Mutation, Query } from '@nestjs/graphql';
-import {Inject} from '@nestjs/common';
+import {Inject, UploadedFile} from '@nestjs/common';
 import {LabelService} from '../../service/dhl/label.service';
 import {DhlLabelReqBody} from '../../interfaces/dhl/dhl.label.req.body';
 import {TrackingService} from '../../service/dhl/tracking.service';
@@ -18,6 +18,11 @@ export class LabelResolver {
     @Query('DhlTracking')
     async DhlTracking(obj, body: {params: string[] }) {
         result = await this.trackingService.tracking(body.params);
+        return result;
+    }
+    @Mutation('DeleteOrCancelShipments')
+    async DeleteOrCancelShipments(obj, body: {shipmentIDs: string[]}){
+        result = await this.trackingService.deleteOrCancelShipments(body.shipmentIDs);
         return result;
     }
 }

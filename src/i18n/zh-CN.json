@@ -2,5 +2,9 @@
 	"修改消息": "修改消息",
 	"删除消息": "删除消息",
 	"CmsModule": "CmsModule",
-	"Login success": "Login success"
+	"Login success": "Login success",
+	"ShipmentId already exist": "shipmentId 已存在",
+    "Shipment with id [%s] is not exit": "shipmentId 为[%s]的标签不存在",
+	"Domestic shipments can only be cancelled before Pick-up / Processing by DHL": "国内发货,只能在DHL提货/处理前取消。",
+	"International shipments can only be deleted before close out": "国际发货只能在关闭前删除"
 }

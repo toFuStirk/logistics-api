@@ -6,11 +6,11 @@ export interface DhlLabelReqBody {
     pickupDateTime: string;
     inlineLabelReturn: 'Y'|'N'|'U'|'NULL';
     handoverMethod: number;
-    pickupAddress: [PickupAddress];
+    pickupAddress: PickupAddress;
     /*如果产品代码是PDR，而shipmentID最初是通过DHL发货，则为可选。*/
-    shipperAddress: [ShipperAddress];
+    shipperAddress: ShipperAddress;
     shipmentItems: [ShipmentItems];
-    label: [Label];
+    label: Label;
 }
 export interface PickupAddress {
     companyName: string;
@@ -74,6 +74,9 @@ export interface ShipmentItems {
     locationID: string;
     shipmentPieces: [ShipmentPieces];
     valueAddedServices: [ValueAddedServices];
+    shipmentContents: [ShipmentContents];
+    parentId: number;
+    shipmentNo: string;
 }
 export interface ConsigneeAddress extends PickupAddress {
     // Consignee Identification Number
@@ -106,4 +109,38 @@ export interface ValueAddedServices {
 export interface ValueAddedService {
     vasCode: string;
     attributes: {attributeName: string, attributeValue: string };
+}
+export interface ShipmentContents {
+    // 产品 SKU 编码
+    skuNumber: string;
+    // 产品描述
+    description: string;
+    // 产品中文出口描述
+    descriptionExport: string;
+    // 产品英文进口描述
+    descriptionImport: string;
+    // 产品单价
+    itemValue: number;
+    // 产品数量
+    itemQuantity: number;
+    // 产品净重
+    grossWeight: number;
+    // 装运总内容净重
+    netWeight: number;
+    // 产品净重单位
+    weightUOM: string;
+    // 产品属性标识
+    contentIndicator: string;
+    // 产品原产国
+    countryOfOrigin: string;
+    // 产品海关编码
+    hsCode: string;
+    // 中央货物和服务税的金额，强制性为印度Ewaybill的合格客户。
+    cgstAmount: number;
+    // 国家货物和服务税的数额，强制性为印度Ewaybill的合格客户
+    sgstAmount: number;
+    // 综合货物和服务税的金额，强制性为印度Ewaybill的合格客户
+    igstAmount: number;
+    // 印度运单合格客户必须支付的手续费
+    cessAmount: number;
 }

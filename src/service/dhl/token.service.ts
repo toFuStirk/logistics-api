@@ -3,7 +3,7 @@ import dhlApi from '../../config/dhl/api.config';
 import {HttpUtil} from '../../utils/http.util';
 import {DhlTokenResBody} from '../../interfaces/dhl/dhl.token.res.body';
 import {InjectRepository} from '@nestjs/typeorm';
-import {TokenEntity} from '../../model/ahl/token.entity';
+import {TokenEntity} from '../../model/dhl/token.entity';
 import {Repository} from 'typeorm';
 const dhlKey = require('../../config/dhl/key.config.json');
 @Injectable()

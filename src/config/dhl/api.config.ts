@@ -3,5 +3,8 @@ export default {
     test: 'https://sandbox.dhlecommerce.asia',
     token: '/rest/v1/OAuth/AccessToken',
     label: '/rest/v2/Label',
-    tracking: '/rest/v3/Tracking/'
+    tracking: '/rest/v3/Tracking',
+    edit: '/rest/v2/Label/Edit',
+    deleteOrCancel: '/rest/v2/Label/Delete'
+
 };

@@ -18,6 +18,7 @@ export class HttpUtil {
                     ok();
                     return;
                 } else {
+                    console.log(body);
                     json = JSON.parse(body);
                     ok();
                     return;
@@ -34,6 +35,7 @@ export class HttpUtil {
         let json: any;
         let ex: any;
         const body = JSON.stringify(params);
+        console.log('请求');
         console.log(body);
         await new Promise((ok, no) => {
             // 以post形式发出请求

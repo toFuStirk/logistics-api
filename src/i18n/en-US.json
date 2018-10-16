@@ -6,5 +6,9 @@
     "Currently specified classes cannot add articles": "Currently specified classes cannot add articles",
     "Classification aliases cannot be repeated": "Classification aliases cannot be repeated",
     "Review the success": "Review the success",
-    "Delete the success": "Delete the success"
+    "Delete the success": "Delete the success",
+    "ShipmentId already exist": "ShipmentId already exist",
+    "Shipment with id [%s] is not exit": "Shipment with id [%s] is not exit",
+    "Domestic shipments can only be cancelled before Pick-up / Processing by DHL": " Domestic shipments can only be cancelled before Pick-up / Processing by DHL",
+    "International shipments can only be deleted before close out": "International shipments can only be deleted before close out"
 }

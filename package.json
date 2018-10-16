@@ -32,7 +32,8 @@
         "rxjs": "^6.3.2",
         "typeorm": "^0.2.7",
         "typescript": "^3.0.3",
-        "underscore": "^1.9.1"
+        "underscore": "^1.9.1",
+        "i18n": "^0.8.3"
     },
     "devDependencies": {
         "@types/graphql": "^14.0.0",
