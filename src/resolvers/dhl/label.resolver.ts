@@ -21,7 +21,7 @@ export class LabelResolver {
         return result;
     }
     @Mutation('DeleteOrCancelShipments')
-    async DeleteOrCancelShipments(obj, body: {shipmentIDs: string[]}){
+    async DeleteOrCancelShipments(obj, body: {shipmentIDs: string[]}) {
         result = await this.trackingService.deleteOrCancelShipments(body.shipmentIDs);
         return result;
     }

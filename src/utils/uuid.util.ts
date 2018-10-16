@@ -3,7 +3,7 @@ import {Injectable} from '@nestjs/common';
 @Injectable()
 export class UuidUtil {
     async uuids(len, radix) {
-        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split("");
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
         const uuid = [];
         let  i;
         radix = radix || chars.length;
