@@ -25,4 +25,9 @@ export class LabelResolver {
         result = await this.trackingService.deleteOrCancelShipments(body.shipmentIDs);
         return result;
     }
+    @Mutation('closeOutShipments')
+    async closeOutShipments(obj, body: {shipmentItems: {shipmentID: string, bagID?: string} []}) {
+        result = await this.trackingService.closeOutShipments(body.shipmentItems);
+        return result;
+    }
 }

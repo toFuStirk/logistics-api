@@ -1,4 +1,4 @@
-import {Module, OnModuleInit} from '@nestjs/common';
+import {Module, MulterModule, OnModuleInit} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {TokenEntity} from '../model/dhl/token.entity';
 import {ShipmentEntity} from '../model/dhl/shipment.entity';
@@ -12,9 +12,14 @@ import {MetadataScanner} from '@nestjs/core/metadata-scanner';
 import {PagerUtil} from '../utils/pager.util';
 import {HttpUtil} from '../utils/http.util';
 import {UuidUtil} from '../utils/uuid.util';
+import {DhlController} from '../controllers/dhl.controller';
+import {MulterConfigService} from '../config/multer.config.service';
 
 @Module({
     imports: [
+        MulterModule.registerAsync({
+            useClass: MulterConfigService
+        }),
         TypeOrmModule.forFeature([
             TokenEntity,
             ShipmentEntity,
@@ -30,6 +35,9 @@ import {UuidUtil} from '../utils/uuid.util';
         LabelService,
         LabelResolver,
         TrackingService
+    ],
+    controllers: [
+        DhlController
     ]
 })
 export class DhlModule implements OnModuleInit {

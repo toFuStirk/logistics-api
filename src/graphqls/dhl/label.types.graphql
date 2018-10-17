@@ -1,10 +1,15 @@
 type Mutation{
     LabelTheDelivery(params:LabelDeliveryInput):String,
     #  DELETE International shipments or CANCEL Domestic shipments
-    DeleteOrCancelShipments(shipmentIDs: [String]!): String
+    DeleteOrCancelShipments(shipmentIDs: [String]!): String,
+    closeOutShipments(shipmentItems:[closeOutShipments]): String
 }
 type Query{
     DhlTracking(params:[String]!):String
+}
+input closeOutShipments{
+    shipmentID: String!,
+    bagID: String
 }
 input LabelDeliveryInput{
     pickupAddress:PickupAddress,
