@@ -14,6 +14,8 @@ import {HttpUtil} from '../utils/http.util';
 import {UuidUtil} from '../utils/uuid.util';
 import {DhlController} from '../controllers/dhl.controller';
 import {MulterConfigService} from '../config/multer.config.service';
+import {TrackingEntity} from "../model/dhl/tracking.entity";
+import {TrackingItemsEntity} from "../model/dhl/tracking.items.entity";
 
 @Module({
     imports: [
@@ -21,9 +23,11 @@ import {MulterConfigService} from '../config/multer.config.service';
             useClass: MulterConfigService
         }),
         TypeOrmModule.forFeature([
+            TrackingItemsEntity,
             TokenEntity,
             ShipmentEntity,
-            ShipmentItemsEntity
+            ShipmentItemsEntity,
+            TrackingEntity
         ])
     ],
     providers: [

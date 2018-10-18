@@ -1,0 +1,10 @@
+mutation createUser{
+    createUser(createUserInput: {
+        username: "15389665241",
+        password: "123456",
+    }){
+        code,
+        message
+    }
+}
+

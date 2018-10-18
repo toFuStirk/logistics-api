@@ -1,4 +1,4 @@
-import {Column, Entity, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
 import {Destination, ServiceCode} from '../../interfaces/dhl/dhl.tracking.res.body';
 import {TrackingItemsEntity} from './tracking.items.entity';
 
@@ -55,6 +55,6 @@ export class TrackingEntity {
     })
     weightUnit: string;
     // 具体事件
-    @ManyToOne(type => TrackingItemsEntity, items =>  items.tracks)
-    events: [TrackingItemsEntity];
+    @OneToMany(type => TrackingItemsEntity, items => items.tracks)
+    events: TrackingItemsEntity[];
 }

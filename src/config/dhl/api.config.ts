@@ -5,6 +5,6 @@ export default {
     label: '/rest/v2/Label',
     tracking: '/rest/v3/Tracking',
     edit: '/rest/v2/Label/Edit',
-    deleteOrCancel: '/rest/v2/Label/Delete'
-
+    deleteOrCancel: '/rest/v2/Label/Delete',
+    closeOut: '/rest/v2/Order/Shipment/CloseOut'
 };

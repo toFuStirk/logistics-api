@@ -8,12 +8,14 @@ import { PagerUtil } from './utils/pager.util';
 import {HttpUtil} from './utils/http.util';
 import {UuidUtil} from './utils/uuid.util';
 import {DhlModule} from './modules/dhl.module';
+import {UserModule} from './modules/user.module';
 
 @Module({
     imports: [
         GraphQLModule.forRootAsync({useClass: GraphqlConfig}),
         TypeOrmModule.forRoot(),
         DhlModule,
+        UserModule
     ],
     providers: [
       //  { provide: APP_INTERCEPTOR, useClass: ErrorsInterceptor },

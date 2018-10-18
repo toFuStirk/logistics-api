@@ -1,10 +1,13 @@
-import {Column, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {AddressInterface} from '../../interfaces/dhl/dhl.tracking.res.body';
 import {TrackingEntity} from './tracking.entity';
-
+@Entity('dhl_track_items_tab')
 export class TrackingItemsEntity {
     @PrimaryGeneratedColumn()
     id: number;
+    /*物流信息Id*/
+    @Column({ nullable: true })
+    parentId: number;
     // status
     @Column({
         name: 'status',
@@ -36,11 +39,17 @@ export class TrackingItemsEntity {
     // 地址
     @Column({
         name: 'address',
-        nullable: true
+        nullable: true,
+        type: 'json'
     })
     address: AddressInterface;
     // 父级
-    @ManyToOne(type => TrackingEntity, track => track.events)
+    @ManyToOne(type => TrackingEntity, track => track.events, {
+        cascade: true,
+        onDelete: 'CASCADE',
+        lazy: false,
+        eager: false
+    })
+    @JoinTable()
     tracks: TrackingEntity;
-
 }

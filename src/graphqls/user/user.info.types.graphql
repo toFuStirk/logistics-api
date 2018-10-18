@@ -1,0 +1,30 @@
+type tokenInfo{
+    accessToken: String,
+    expiresIn: Float
+}
+type UserInfoData {
+    userId: Int,
+    username: String,
+    mobile: String,
+    banned: Boolean,
+    recycle: Boolean,
+    createTime: String,
+    updateTime: String,
+    userRoles:[UserRole],
+    userInfos: [UserInfo],
+}
+type UserRole{
+    id: Int,
+    name: String
+}
+type UserInfo{
+    id: Int,
+    order: Int,
+    relationId: Int,
+    type: String,
+    name: String,
+    value: String,
+    description: String,
+    registerDisplay: Boolean,
+    informationDisplay: Boolean
+}

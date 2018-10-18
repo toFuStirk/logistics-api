@@ -1,0 +1,49 @@
+type Query{
+    login(userName: String, password: String): LoginResult,
+    findAllUser(pageSize: Int!, pageNumber: Int!, roleId: Int, userName: String): AllUsers
+}
+type Mutation{
+    createUser(createUserInput: CreateUserInput): ResultCode,
+    deleteUser(id: Int!): ResultCode,
+    updateUserInfo(id: Int, updateUserInput: UpdateUserInfo): ResultCode,
+    # status is 'recycled' | 'banned'
+    revertBannedOrRecycledUser(id:Int!, status: String): ResultCode,
+    # action is  'recycle' | 'ban'
+    recycleOrBanUser(id:Int!, action: String): ResultCode,
+}
+type AllUsers{
+    code: Int,
+    message: String,
+    pagination: ReturnPage,
+    users: [UserInfoData]
+}
+input CreateUserInput{
+    username: String,
+    password: String,
+    infoKVs: [Infokey],
+    roleIds: [Int],
+    organizationIds: [Int],
+}
+input Infokey{
+    key: Int,
+    value: String,
+    relationId: Int
+}
+input UpdateUserInfo{
+    username: String,
+    password: String,
+    infoKVs: [Infokey],
+    roleIds: [Int],
+    roleIds: [UpdateUserRole],
+    organizationIds:[UpdateUserRole],
+}
+input UpdateUserRole{
+    before: Int,
+    after: Int,
+}
+type LoginResult{
+    code: Int,
+    message: String,
+    tokenInfo: tokenInfo,
+    userInfoData: UserInfoData
+}
