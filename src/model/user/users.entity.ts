@@ -12,6 +12,7 @@ import moment = require('moment');
 import {UserInfoEntity} from './user.info.entity';
 import {RoleEntity} from './role.entity';
 import {PersonalPermissionEntity} from './personal.permission.entity';
+import {OrganizationEntity} from './organization.entity';
 
 @Entity('user')
 export class User {
@@ -23,12 +24,6 @@ export class User {
         nullable: true
     })
     username: string;
-
-    @Column({
-        unique: true,
-        nullable: true
-    })
-    email: string;
 
     @Column({
         unique: true,
@@ -57,6 +52,12 @@ export class User {
     })
     @JoinTable()
     roles: RoleEntity[];
+    // 用户组织
+    @ManyToMany(type => OrganizationEntity, organization => organization.users, {
+        onDelete: 'CASCADE'
+    })
+    @JoinTable()
+    organizations: OrganizationEntity[];
     // 用户权限
     @OneToMany(type => PersonalPermissionEntity, personalPermission => personalPermission.user)
     personalPermissions: PersonalPermissionEntity[];

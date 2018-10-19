@@ -12,6 +12,7 @@ type UserInfoData {
     updateTime: String,
     userRoles:[UserRole],
     userInfos: [UserInfo],
+    userOrganizations: [UserRole]
 }
 type UserRole{
     id: Int,

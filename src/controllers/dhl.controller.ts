@@ -23,8 +23,6 @@ export class DhlController {
                 // 插入数据库， 并修改excels文件添加order 列
                 await this.dhlLabelService.LabelTheDelivery(lableAddress);
             }
-
-
         }
         console.log('表信息如下', result);
         // 写入文件

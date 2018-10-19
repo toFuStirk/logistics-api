@@ -17,6 +17,10 @@ export interface UserInfoData {
         id: number;
         name: string
     }[];
+    userOrganizations: {
+        id: number;
+        name: string;
+    }[];
     userInfos: {
         id: number;
         order: number;

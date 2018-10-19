@@ -1,0 +1,12 @@
+type Query{
+    findRoots: ResultCode,
+    findAllTrees: ResultCode,
+    findChildren(id: Int!):ResultCode,
+}
+type Mutation{
+    createOrganization(name: String!, parentId: Int! ):ResultCode,
+    updateOrganization(id: Int!, name: String, parentId: Int):ResultCode,
+    deleteOrganization(id:Int!):ResultCode,
+    addUsersToOrganization(id: Int!, userIds: [Int]!):ResultCode,
+    deleteUserFromOrganization(id: Int!, userIds: [Int]!):ResultCode
+}

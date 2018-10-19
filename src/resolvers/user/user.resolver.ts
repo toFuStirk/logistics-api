@@ -1,8 +1,10 @@
 import {Resolver, Mutation, Query } from '@nestjs/graphql';
-import {Inject} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import {Inject, UseGuards} from '@nestjs/common';
 import {UserService} from '../../service/user/user.service';
 import {CreateUserInput, UpdateUserInput} from '../../interfaces/user/user.interface';
 import {PagerUtil} from '../../utils/pager.util';
+import {JwtAuthGuard} from '../../service/user/jwt-auth.guard';
 let result;
 @Resolver('user')
 export class UserResolver {
@@ -16,7 +18,8 @@ export class UserResolver {
         return result;
     }
     @Query('findAllUser')
-    async findAllUser(obj, body: {pageSize: number, pageNumber: number, roleId: number, userName: string}){
+    @UseGuards(JwtAuthGuard)
+    async findAllUser(obj, body: {pageSize: number, pageNumber: number, roleId: number, userName: string}) {
         result = await this.userService.findAllUser(body.pageSize, body.pageNumber, body.roleId, body.userName);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
         return result;
@@ -32,17 +35,17 @@ export class UserResolver {
         return {code: 200, message: '删除成功'};
     }
     @Mutation('updateUserInfo')
-    async updateUserInfo(obj, body: {id: number, updateUserInput: UpdateUserInput }){
+    async updateUserInfo(obj, body: {id: number, updateUserInput: UpdateUserInput }) {
         result = await this.userService.updateUserInfo(body.id, body.updateUserInput);
         return result;
     }
     @Mutation('revertBannedOrRecycledUser')
-    async revertBannedOrRecycledUser(body: {id: number, status: 'recycled' | 'banned'}){
+    async revertBannedOrRecycledUser(body: {id: number, status: 'recycled' | 'banned'}) {
         result = await this.userService.revertBannedOrRecycledUser(body.id, body.status);
         return result;
     }
     @Mutation('recycleOrBanUser')
-    async recycleOrBanUser(body: {id: number, action: 'recycle' | 'ban'}){
+    async recycleOrBanUser(body: {id: number, action: 'recycle' | 'ban'}) {
         result = await this.userService.recycleOrBanUser(body.id, body.action);
         return result;
     }

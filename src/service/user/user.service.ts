@@ -1,15 +1,13 @@
 import {Inject, Injectable} from '@nestjs/common';
 import {User} from '../../model/user/users.entity';
-import {In, Not, Repository} from 'typeorm';
+import {Repository} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm';
-import { __ as t } from 'i18n';
 import {CreateUserInput, UpdateUserInput, UserInfoData} from '../../interfaces/user/user.interface';
 import {CryptoUtil} from '../../utils/crypto.util';
 import {UserInfoEntity} from '../../model/user/user.info.entity';
 import {UserLoginLogsEntity} from '../../model/user/user.login.logs.entity';
 import {InfoItemEntity} from '../../model/user/info.item.entity';
 import {AuthService} from './auth.service';
-import {asapScheduler} from "rxjs";
 
 @Injectable()
 export class UserService {
@@ -123,11 +121,12 @@ export class UserService {
      *
      * @param id The specified user id
      */
-    async deleteUser(id: number): Promise<void> {
+    async deleteUser(id: number) {
         const user = await this.userRepo.findOne(id, { relations: ['roles', 'organizations'] });
         await this.userRepo.createQueryBuilder('user').relation(User, 'roles').of(user).remove(user.roles);
       //  await this.userRepo.createQueryBuilder('user').relation(User, 'organizations').of(user).remove(user.organizations);
         await this.userRepo.remove(user);
+        return {code: 200, message: '删除成功'};
     }
 
     /**
@@ -185,6 +184,7 @@ export class UserService {
         if (updateUserInput.infoKVs && updateUserInput.infoKVs.length) {
             await this.createOrUpdateUserInfos(user, updateUserInput.infoKVs, 'update');
         }
+        return {code: 200, message: '修改成功'};
     }
 
 
@@ -203,6 +203,7 @@ export class UserService {
             createTime: user.createTime,
             updateTime: user.updateTime,
             userRoles: user.roles,
+            userOrganizations: user.organizations,
             userInfos: infoItems.length ? infoItems.map(infoItem => {
                 const userInfo = user.userInfos.find(userInfo => userInfo.infoItem.id === infoItem.id);
                 return {
@@ -229,7 +230,7 @@ export class UserService {
      * @param userName
      */
     async findAllUser(pageSize: number, pageNumber: number, roleId: number, userName: string) {
-      /*  const users = await this.userRepo.createQueryBuilder('user')
+        const users = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .where('user.userName like :userName ',  { userName: `%${userName ? userName : ''}%`})
             .andWhere('case when :roleId1 <> 0 then roles.id = :roleId2 else roles.id is not null end', {
@@ -239,21 +240,7 @@ export class UserService {
             .andWhere('user.recycle = false')
             .skip(pageSize * (pageNumber - 1))
             .take(pageSize)
-            .getManyAndCount();*/
-        const users = await this.userRepo.findAndCount({
-            where: {
-                username: `%${userName ? userName : ''}%`,
-                roles: roleId ? roleId : Not(undefined),
-            },
-            join: {
-                alias: 'roles',
-            },
-            relations: ['roles'],
-            skip: pageSize * (pageNumber - 1),
-            take: pageSize
-        });
-        console.log('返回结果是');
-        console.log(users[0]);
+            .getManyAndCount();
         if (!users[0].length) {
             return {code: 404, message: '没有找到用户'};
         }
@@ -263,6 +250,7 @@ export class UserService {
     async findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]> {
         const userQb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('user.organizations', 'organizations')
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem');
 
