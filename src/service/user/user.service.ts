@@ -1,4 +1,4 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {forwardRef, HttpException, Inject, Injectable} from '@nestjs/common';
 import {User} from '../../model/user/users.entity';
 import {Repository} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm';
@@ -17,6 +17,7 @@ export class UserService {
         @InjectRepository(InfoItemEntity) private readonly infoItemRepo: Repository<InfoItemEntity>,
         @InjectRepository(UserLoginLogsEntity) private readonly loginLogRepo: Repository<UserLoginLogsEntity>,
         @Inject(CryptoUtil) private readonly cryptoUtil: CryptoUtil,
+        @Inject(forwardRef(() => AuthService))
         @Inject(AuthService) private readonly authService: AuthService
     ) {}
 
@@ -230,6 +231,7 @@ export class UserService {
      * @param userName
      */
     async findAllUser(pageSize: number, pageNumber: number, roleId: number, userName: string) {
+        console.log('service');
         const users = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .where('user.userName like :userName ',  { userName: `%${userName ? userName : ''}%`})
@@ -271,6 +273,18 @@ export class UserService {
             const infoItem = await infoItemQb.where('users.id = :id', { id }).orderBy('infoItem.order', 'ASC').getMany();
             return this.refactorUserData(user, infoItem);
         }
+    }
+    async findOneWithRolesAndPermissions(loginName) {
+        const user = await this.userRepo.createQueryBuilder('user')
+            .leftJoinAndSelect('user.roles', 'roles')
+            .leftJoinAndSelect('roles.permissions', 'permissions')
+            .where('user.username = :loginName', { loginName })
+            .orWhere('user.mobile = :loginName', { loginName })
+            .getOne();
+        if (!user) {
+            throw new HttpException('User does not exist', 404);
+        }
+        return user;
     }
 
 }

@@ -1,4 +1,4 @@
-import {Global, Module, MulterModule, OnModuleInit} from '@nestjs/common';
+import {Global, Inject, Module, MulterModule, OnModuleInit} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {User} from '../model/user/users.entity';
 import {UserLoginLogsEntity} from '../model/user/user.login.logs.entity';
@@ -24,7 +24,10 @@ import {EntityCheckService} from '../service/user/entity.check.service';
 import {UserController} from '../controllers/user.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import {JwtStrategy} from "../service/user/auth.strategy";
+import {JwtStrategy} from '../service/user/auth.strategy';
+import {Repository} from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+const authConstant = require('./../constants/auth.constant');
 
 @Module({
     imports: [
@@ -50,12 +53,12 @@ import {JwtStrategy} from "../service/user/auth.strategy";
         ])
     ],
     providers: [
-        // JwtStrategy,
         PagerUtil,
         CryptoUtil,
         UserResolver,
         UserService,
         AuthService,
+        JwtStrategy,
         RoleService,
         RoleResolver,
         EntityCheckService,
@@ -70,4 +73,61 @@ import {JwtStrategy} from "../service/user/auth.strategy";
     ]
 })
 @Global()
-export class UserModule {}
+export class UserModule implements OnModuleInit {
+    constructor(
+        @Inject(UserService) private readonly userService: UserService,
+        @InjectRepository(RoleEntity) private readonly roleRepo: Repository<RoleEntity>,
+        @InjectRepository(InfoGroupEntity) private readonly infoGroupRepo: Repository<InfoGroupEntity>,
+        @InjectRepository(User) private readonly userRepo: Repository<User>
+    ) { }
+    static forRoot(options: {
+        authTokenWhiteList?: string[];
+    }) {
+        if (options.authTokenWhiteList) {
+            options.authTokenWhiteList.push(...['IntrospectionQuery', 'adminLogin', 'register']);
+        }
+        else {
+            options.authTokenWhiteList = ['IntrospectionQuery', 'login', 'adminLogin', 'register'];
+        }
+        return {
+            providers: [{ provide: authConstant.AUTH_TOKEN_WHITE_LIST, useValue: options.authTokenWhiteList }],
+            module: UserModule
+        };
+    }
+    // @ts-ignore
+    async onModuleInit() {
+        await this.createDefaultRole();
+        await this.createDefaultInfoGroup();
+        await this.createSuperAdmin();
+    }
+    private async createDefaultRole() {
+        const defaultRole = await this.roleRepo.findOne(1);
+
+        if (defaultRole) return;
+
+        await this.roleRepo.save(this.roleRepo.create({
+            id: 1,
+            name: 'ordinary user'
+        }));
+    }
+    private async createDefaultInfoGroup() {
+        const defaultInfoGroup = await this.infoGroupRepo.findOne(1);
+        if (defaultInfoGroup) return;
+        await this.infoGroupRepo.save(this.infoGroupRepo.create({
+            id: 1,
+            name: 'ordinary user information group',
+            role: {
+                id: 1
+            }
+        }));
+    }
+
+    /**
+     * Create a system super administrator
+     */
+    private async createSuperAdmin() {
+        const sadmin = await this.userRepo.findOne({ where: { username: 'sadmin' } });
+        if (sadmin) return;
+        await this.userService.createUser({ username: 'sadmin', password: 'sadmin' });
+    }
+}

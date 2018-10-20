@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-
+import * as passport from 'passport';
+import { TokenExpiredError } from 'jsonwebtoken';
 import { AppModule } from './app.module';
-import { Transport } from '@nestjs/common/enums/transport.enum';
+import {AUTH_TOKEN_WHITE_LIST} from './constants/auth.constant';
+import * as url from 'url';
+
 /**
  * 跨域问题
  * @param req
@@ -27,6 +30,25 @@ async function bootstrap() {
         },
         });*/
     app.use(cross);
+    app.use(['/user'], (req, res, next) => {
+        const whiteList = ['/login'];
+        if (req.url && whiteList.includes(req.url)) {
+            return next();
+        }
+        passport.authenticate('jwt', (err, user, info) => {
+            if (info && info instanceof TokenExpiredError) {
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ code: 401, message: 'token过期，请重新登录'}));
+            } else if (!user) {
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ code: 401, message: '授权失败，请检查 token 是否正确' }));
+            } else {
+                res.setHeader('Content-Type', 'application/json');
+                req.user = user;
+                next();
+            }
+        })(req, res);
+    });
     await app.listen(3000);
     // await redisApp.listenAsync();
 }

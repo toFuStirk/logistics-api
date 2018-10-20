@@ -9,7 +9,7 @@
         "noImplicitAny": false,
         "noLib": false,
         "lib": [
-            "es6",
+            "es7",
             "esnext.asynciterable"
         ],
         "noUnusedLocals": false,

@@ -6,6 +6,7 @@ import {CreateUserInput, UpdateUserInput} from '../../interfaces/user/user.inter
 import {PagerUtil} from '../../utils/pager.util';
 import {JwtAuthGuard} from '../../service/user/jwt-auth.guard';
 let result;
+@UseGuards(JwtAuthGuard)
 @Resolver('user')
 export class UserResolver {
     constructor(
@@ -18,8 +19,7 @@ export class UserResolver {
         return result;
     }
     @Query('findAllUser')
-    @UseGuards(JwtAuthGuard)
-    async findAllUser(obj, body: {pageSize: number, pageNumber: number, roleId: number, userName: string}) {
+    async findAllUser(obj, body: {pageSize: number, pageNumber: number, roleId: number, userName: string}, context) {
         result = await this.userService.findAllUser(body.pageSize, body.pageNumber, body.roleId, body.userName);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
         return result;

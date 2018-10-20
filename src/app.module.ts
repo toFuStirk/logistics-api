@@ -4,9 +4,6 @@ import { ErrorsInterceptor } from './interceptors/errors.interceptor';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GraphqlConfig } from './config/graphql.config';
-import { PagerUtil } from './utils/pager.util';
-import {HttpUtil} from './utils/http.util';
-import {UuidUtil} from './utils/uuid.util';
 import {DhlModule} from './modules/dhl.module';
 import {UserModule} from './modules/user.module';
 
@@ -15,7 +12,9 @@ import {UserModule} from './modules/user.module';
         GraphQLModule.forRootAsync({useClass: GraphqlConfig}),
         TypeOrmModule.forRoot(),
         DhlModule,
-        UserModule
+        UserModule.forRoot({
+            authTokenWhiteList: ['login', '/login']
+        })
     ],
     providers: [
       //  { provide: APP_INTERCEPTOR, useClass: ErrorsInterceptor },
