@@ -4,6 +4,8 @@ import {RoleService} from '../service/user/role.service';
 import {OrganizationService} from '../service/user/organization.service';
 import {PagerUtil} from '../utils/pager.util';
 import {CreateUserInput, UpdateUserInput} from '../interfaces/user/user.interface';
+import {Permission, Resource} from '../decorator';
+@Resource({name: '用户管理', identify: 'user'})
 @Controller('user')
 export class UserController {
     constructor(
@@ -12,6 +14,7 @@ export class UserController {
         @Inject(OrganizationService) private readonly organizationService: OrganizationService,
         @Inject(PagerUtil) private readonly pagerUtil: PagerUtil
     ) {}
+    @Permission({name: '创建用户', identify: 'user/createUser', action: 'create'})
     @Post('/createUser')
     async createUser(@Body() createUserInput: CreateUserInput, @Res() res) {
         const result = await this.userService.createUser(createUserInput);

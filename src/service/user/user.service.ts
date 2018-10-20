@@ -231,7 +231,6 @@ export class UserService {
      * @param userName
      */
     async findAllUser(pageSize: number, pageNumber: number, roleId: number, userName: string) {
-        console.log('service');
         const users = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .where('user.userName like :userName ',  { userName: `%${userName ? userName : ''}%`})

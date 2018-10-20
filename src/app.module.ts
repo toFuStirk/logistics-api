@@ -13,7 +13,7 @@ import {UserModule} from './modules/user.module';
         TypeOrmModule.forRoot(),
         DhlModule,
         UserModule.forRoot({
-            authTokenWhiteList: ['login', '/login']
+            authTokenWhiteList: ['login', 'getToken']
         })
     ],
     providers: [

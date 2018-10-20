@@ -2,8 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import * as passport from 'passport';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { AppModule } from './app.module';
-import {AUTH_TOKEN_WHITE_LIST} from './constants/auth.constant';
-import * as url from 'url';
 
 /**
  * 跨域问题
