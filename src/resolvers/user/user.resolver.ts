@@ -15,13 +15,20 @@ export class UserResolver {
     ) {}
     @Query('login')
     async login(obj, body: {userName: string, password: string}) {
-        result = await this.userService.login(body.userName, body.password);
+        // result = await this.userService.login(body.userName, body.password);
         return result;
     }
     @Query('findAllUser')
     async findAllUser(obj, body: {pageSize: number, pageNumber: number, roleId: number, userName: string}, context) {
         result = await this.userService.findAllUser(body.pageSize, body.pageNumber, body.roleId, body.userName);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
+        return result;
+    }
+    @Query('findUserLoginLogs')
+    async findUserLoginLogs(obj, body: {pageNumber: number, pageSize: number, username: string, keywords?: string, startTime?: Date, endTime?: Date}) {
+        const {pageNumber, pageSize, username, keywords, startTime, endTime} = body;
+        result = await this.userService.findUserLoginLogs(pageNumber, pageSize, username, keywords, new Date(startTime), new Date(endTime));
+        result.pagination = await this.pagerUtil.getPager(result.totalItems, pageNumber, pageSize);
         return result;
     }
     @Mutation('createUser')

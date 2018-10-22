@@ -18,7 +18,6 @@ export class HttpUtil {
                     ok();
                     return;
                 } else {
-                    console.log(body);
                     json = JSON.parse(body);
                     ok();
                     return;

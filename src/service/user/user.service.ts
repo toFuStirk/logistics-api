@@ -1,8 +1,13 @@
 import {forwardRef, HttpException, Inject, Injectable} from '@nestjs/common';
 import {User} from '../../model/user/users.entity';
-import {Repository} from 'typeorm';
+import {Between, Like, Repository} from 'typeorm';
 import {InjectRepository} from '@nestjs/typeorm';
-import {CreateUserInput, UpdateUserInput, UserInfoData} from '../../interfaces/user/user.interface';
+import {
+    CreateUserInput,
+    UpdateUserInput,
+    UserInfoData,
+    UserLoginLogInterface
+} from '../../interfaces/user/user.interface';
 import {CryptoUtil} from '../../utils/crypto.util';
 import {UserInfoEntity} from '../../model/user/user.info.entity';
 import {UserLoginLogsEntity} from '../../model/user/user.login.logs.entity';
@@ -75,7 +80,6 @@ export class UserService {
                 });
                 return;
             }
-
             infoKVs.forEach(async infoKV => {
                 if (infoKV.key) {
                     await this.userInfoRepo.update(infoKV.key, { value: infoKV.value });
@@ -91,17 +95,24 @@ export class UserService {
      * @param loginName
      * @param password
      */
-    async login(loginName: string, password: string) {
+    async login(loginName: string, password: string, log: UserLoginLogInterface) {
         const user = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('user.userInfos', 'userInfos')
             .leftJoinAndSelect('userInfos.infoItem', 'infoItem')
             .where('user.username = :loginName', { loginName })
             .getOne();
-
         if (!user) return{ code: 404, message: '当前用户不存在' };
-        if (user.banned || user.recycle) return{ code: 400, message: '当前账号已被封禁或在回收站中' };
+        log.userId = user.id;
+        log.userName = user.username;
+        if (user.banned || user.recycle) {
+            log.loginRet = '当前账号已被封禁或在回收站中';
+            await this.loginLogRepo.save(await this.loginLogRepo.create(log));
+            return{ code: 400, message: '当前账号已被封禁或在回收站中' };
+        }
         if (!await this.cryptoUtil.checkPassword(password, user.password)) {
+            log.loginRet = '用户名或密码错误';
+            await this.loginLogRepo.save(await this.loginLogRepo.create(log));
             return{ code: 404, message: '用户名或密码错误' };
         }
         // 用户信息
@@ -115,6 +126,8 @@ export class UserService {
             .getMany();
         const userInfoData = this.refactorUserData(user, infoItem);
         const tokenInfo = await this.authService.createToken({ loginName });
+        log.loginRet = '登录成功';
+        await this.loginLogRepo.save(await this.loginLogRepo.create(log));
         return { code: 200, message: '登录成功' , tokenInfo, userInfoData };
     }
     /**
@@ -248,6 +261,7 @@ export class UserService {
         const result = await this.findUserInfoById(users[0].map(user => user.id));
         return {code: 200, message: '查找成功', totalItems: users[1], users: result};
     }
+    /* 查询用户信息组*/
     async findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]> {
         const userQb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
@@ -273,6 +287,7 @@ export class UserService {
             return this.refactorUserData(user, infoItem);
         }
     }
+    /* 查询当前用户角色和权限*/
     async findOneWithRolesAndPermissions(loginName) {
         const user = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
@@ -285,5 +300,18 @@ export class UserService {
         }
         return user;
     }
-
+    /* 查询系统登录日志 */
+    async findUserLoginLogs(pageNumber: number, pageSize: number, username?: string, keywords?: string, startTime?: Date, endTime?: Date) {
+        const logs = await this.loginLogRepo.findAndCount({
+            where: {
+                userName: Like(`%${username || keywords ? (username ? username : keywords) : ''}%`),
+                action: Like(`%${keywords ? keywords : ''}%`),
+                createAt: Between(startTime ? startTime : new Date('1970-1-1 00:00'), endTime ? endTime : new Date())
+            },
+            order: {createAt: 'DESC'},
+            skip: pageSize * (pageNumber - 1),
+            take: pageSize
+        });
+        return{code: 200, message: '查找成功', logs: logs[0], totalItems: logs[1]};
+    }
 }

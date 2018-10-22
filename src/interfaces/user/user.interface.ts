@@ -52,3 +52,18 @@ export interface UpdateUserInput {
         after: number;
     }[];
 }
+export interface UserLoginLogInterface {
+    id?: number;
+    userId?: number;
+    userName?: string;
+    action: string;
+    loginRet?: string;
+    loginIp: string;
+    loginLocal: string;
+    isMobile: string;
+    platForm?: string;
+    os: string;
+    browser: string;
+    language: string;
+    createAt?: Date;
+}

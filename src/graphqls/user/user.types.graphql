@@ -1,6 +1,7 @@
 type Query{
     login(userName: String, password: String): LoginResult,
-    findAllUser(pageSize: Int!, pageNumber: Int!, roleId: Int, userName: String): AllUsers
+    findAllUser(pageSize: Int!, pageNumber: Int!, roleId: Int, userName: String): AllUsers,
+    findUserLoginLogs(pageSize: Int!, pageNumber: Int!,username: String, keywords: String, startTime: String, endTime: String): LogLoginRusult
 }
 type Mutation{
     createUser(createUserInput: CreateUserInput): ResultCode,
@@ -46,4 +47,25 @@ type LoginResult{
     message: String,
     tokenInfo: tokenInfo,
     userInfoData: UserInfoData
+}
+type LogLoginRusult{
+    code: Int,
+    message: String,
+    pagination: ReturnPage,
+    logs: [LoginLog]
+}
+type LoginLog{
+    id: Int,
+    userId: Int,
+    userName: String,
+    action: String,
+    loginRet: String,
+    loginIp: String,
+    loginLocal: String,
+    isMobile: String,
+    platForm: String,
+    os: String,
+    browser: String,
+    language: String,
+    createAt: String,
 }

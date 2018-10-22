@@ -1,8 +1,8 @@
-import {Inject, Injectable} from "@nestjs/common";
+import {Inject, Injectable} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {ResourceEntity} from "../../model/user/resource.entity";
-import {Repository} from "typeorm";
-import {SystemModuleEntity} from "../../model/user/system.module.entity";
+import {ResourceEntity} from '../../model/user/resource.entity';
+import {Repository} from 'typeorm';
+import {SystemModuleEntity} from '../../model/user/system.module.entity';
 
 @Injectable()
 export class ResourceService {

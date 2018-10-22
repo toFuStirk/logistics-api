@@ -33,6 +33,12 @@ import {MetadataScanner} from '@nestjs/core/metadata-scanner';
 import {PERMISSION_DEFINITION, RESOURCE_DEFINITION} from './../decorator';
 import {ResourceService} from '../service/user/resource.service';
 import authConstant = require('./../constants/auth.constant');
+import {HttpUtil} from '../utils/http.util';
+import {ApiConfigEntity} from '../model/user/api.config.entity';
+import {PlatformEntity} from '../model/system/platform.entity';
+import {SystemService} from '../service/system/system.service';
+import {SystemController} from '../controllers/system.controller';
+import {ExchangeRateEntity} from '../model/system/exchange_rate.entity';
 
 @Module({
     imports: [
@@ -45,6 +51,7 @@ import authConstant = require('./../constants/auth.constant');
         }),
         TypeOrmModule.forFeature([
             User,
+            ApiConfigEntity,
             UserLoginLogsEntity,
             UserInfoEntity,
             OrganizationEntity,
@@ -54,10 +61,13 @@ import authConstant = require('./../constants/auth.constant');
             PermissionEntity,
             RoleEntity,
             ResourceEntity,
-            SystemModuleEntity
+            SystemModuleEntity,
+            PlatformEntity,
+            ExchangeRateEntity
         ])
     ],
     providers: [
+        HttpUtil,
         PagerUtil,
         CryptoUtil,
         UserResolver,
@@ -70,9 +80,11 @@ import authConstant = require('./../constants/auth.constant');
         OrganizationService,
         OrganizationResolver,
         ResourceService,
+        SystemService
     ],
     controllers: [
-        UserController
+        UserController,
+        SystemController
     ],
     exports: [
         AuthService

@@ -35,12 +35,12 @@ export class UserLoginLogsEntity {
         nullable: true
     })
     loginLocal: string;
-    // 是否手机号码登录
+    // 是否手机端登录
     @Column({
         name: 'is_mobile',
-        default: false
+        default: '否'
     })
-    isMobile: boolean;
+    isMobile: string;
     // plat_form
     @Column({
         name: 'plat_form',
@@ -70,5 +70,5 @@ export class UserLoginLogsEntity {
     })
     language: string;
     // 操作时间
-    @CreateDateColumn() createAt: string;
+    @CreateDateColumn() createAt: Date;
 }

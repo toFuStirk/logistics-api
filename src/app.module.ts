@@ -16,12 +16,6 @@ import {UserModule} from './modules/user.module';
             authTokenWhiteList: ['login', 'getToken']
         })
     ],
-    providers: [
-      //  { provide: APP_INTERCEPTOR, useClass: ErrorsInterceptor },
-        /*PagerUtil,
-        HttpUtil,
-        UuidUtil*/
-    ],
     exports: []
 })
 export class AppModule {}
