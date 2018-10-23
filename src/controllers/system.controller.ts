@@ -6,7 +6,7 @@ import {PermissionGuard} from '../guards/user/permission.guard';
 let result;
 @Resource({name: '系统设置', identify: 'system'})
 @UseGuards(PermissionGuard)
-@Controller('system')
+@Controller('api/system')
 export class SystemController {
     constructor(
         @Inject(SystemService) private readonly systemService: SystemService

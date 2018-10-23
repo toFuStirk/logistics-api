@@ -13,11 +13,13 @@ import {UserInfoEntity} from '../../model/user/user.info.entity';
 import {UserLoginLogsEntity} from '../../model/user/user.login.logs.entity';
 import {InfoItemEntity} from '../../model/user/info.item.entity';
 import {AuthService} from './auth.service';
+import {PlatformEntity} from '../../model/system/platform.entity';
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(PlatformEntity) private platRepo: Repository<PlatformEntity>,
         @InjectRepository(UserInfoEntity) private readonly userInfoRepo: Repository<UserInfoEntity>,
         @InjectRepository(InfoItemEntity) private readonly infoItemRepo: Repository<InfoItemEntity>,
         @InjectRepository(UserLoginLogsEntity) private readonly loginLogRepo: Repository<UserLoginLogsEntity>,
@@ -103,12 +105,18 @@ export class UserService {
             .where('user.username = :loginName', { loginName })
             .getOne();
         if (!user) return{ code: 404, message: '当前用户不存在' };
+        const platform = await this.platRepo.findOne();
+        const rolesId = user.roles.map(role => role.id);
+        // 普通用户，平台禁止登录时，提示
+        if (!platform.allowUserLogin && !rolesId.includes(1)) {
+            return {code: 404, message: platform.promptInformation};
+        }
         log.userId = user.id;
         log.userName = user.username;
         if (user.banned || user.recycle) {
             log.loginRet = '当前账号已被封禁或在回收站中';
             await this.loginLogRepo.save(await this.loginLogRepo.create(log));
-            return{ code: 400, message: '当前账号已被封禁或在回收站中' };
+            return{ code: 404, message: '当前账号已被封禁或在回收站中' };
         }
         if (!await this.cryptoUtil.checkPassword(password, user.password)) {
             log.loginRet = '用户名或密码错误';

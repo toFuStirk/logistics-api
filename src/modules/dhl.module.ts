@@ -16,6 +16,10 @@ import {DhlController} from '../controllers/dhl.controller';
 import {MulterConfigService} from '../config/multer.config.service';
 import {TrackingEntity} from '../model/dhl/tracking.entity';
 import {TrackingItemsEntity} from '../model/dhl/tracking.items.entity';
+import {LogisticService} from "../service/dhl/logistic.service";
+import {LogisticConfigEntity} from "../model/dhl/logistic.config.entity";
+import {ShippingService} from "../service/dhl/shipping.service";
+import {ShippingManageEntity} from "../model/dhl/shipping.manage.entity";
 
 @Module({
     imports: [
@@ -27,7 +31,9 @@ import {TrackingItemsEntity} from '../model/dhl/tracking.items.entity';
             TokenEntity,
             ShipmentEntity,
             ShipmentItemsEntity,
-            TrackingEntity
+            TrackingEntity,
+            LogisticConfigEntity,
+            ShippingManageEntity
         ])
     ],
     providers: [
@@ -38,7 +44,9 @@ import {TrackingItemsEntity} from '../model/dhl/tracking.items.entity';
         TokenResolver,
         LabelService,
         LabelResolver,
-        TrackingService
+        TrackingService,
+        LogisticService,
+        ShippingService
     ],
     controllers: [
         DhlController

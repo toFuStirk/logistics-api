@@ -28,7 +28,7 @@ async function bootstrap() {
         },
         });*/
     app.use(cross);
-    app.use(['/user', ['/system']], (req, res, next) => {
+    app.use(['/api/user', ['/api/system']], (req, res, next) => {
         const whiteList = ['/login', '/findUserLoginLogs'];
         if (req.url && whiteList.includes(req.url)) {
             return next();

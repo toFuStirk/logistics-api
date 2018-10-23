@@ -16,7 +16,7 @@ const api = require('./../config/user/api.config');
 let result;
 @Resource({name: '用户管理', identify: 'user'})
 @UseGuards(PermissionGuard)
-@Controller('user')
+@Controller('api/user')
 export class UserController {
     constructor(
         @InjectRepository(ApiConfigEntity) private apiRepo: Repository<ApiConfigEntity>,
@@ -35,8 +35,8 @@ export class UserController {
     }
     /* 用户登录接口 */
     @Post('/login')
-    async login(@Req() req, @Body() body: {userName: string, password: string}, @Res() res) {
-        if (!body.userName || !body.password) {
+    async login(@Req() req, @Body() body: {username: string, password: string}, @Res() res) {
+        if (!body.username || !body.password) {
             res.send({code: 405, message: '参数不正确'});
             return;
         }
@@ -54,7 +54,7 @@ export class UserController {
             isMobile: agent.isMobile ? '是' : '否',
             os: agent.os.family
         };
-        const result = await this.userService.login(body.userName, body.password, loginLog);
+        const result = await this.userService.login(body.username, body.password, loginLog);
         res.send(result);
         return;
     }
