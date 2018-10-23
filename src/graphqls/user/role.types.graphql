@@ -4,7 +4,8 @@ type Query{
 type Mutation{
     createRole(name: String!): ResultCode,
     updateRole(id: Int!, name: String!):ResultCode ,
-    deleteRole(id:Int!):ResultCode
+    deleteRole(id:Int!):ResultCode,
+    setPermissions(id: Int!, permissionIds: [Int]!):ResultCode,
 }
 type Role{
     id: Int,

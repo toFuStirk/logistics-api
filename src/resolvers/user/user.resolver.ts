@@ -4,9 +4,11 @@ import {Inject, UseGuards} from '@nestjs/common';
 import {UserService} from '../../service/user/user.service';
 import {CreateUserInput, UpdateUserInput} from '../../interfaces/user/user.interface';
 import {PagerUtil} from '../../utils/pager.util';
-import {JwtAuthGuard} from '../../service/user/jwt-auth.guard';
+import {JwtAuthGuard} from '../../guards/user/jwt-auth.guard';
+import {Permission, Resource} from '../../decorator';
 let result;
 @UseGuards(JwtAuthGuard)
+@Resource({ name: '用户管理', identify: 'user:manage'})
 @Resolver('user')
 export class UserResolver {
     constructor(
@@ -18,8 +20,10 @@ export class UserResolver {
         // result = await this.userService.login(body.userName, body.password);
         return result;
     }
+    @Permission({name: '查询所有用户', identify: 'user:findAllUser', action: 'find' })
     @Query('findAllUser')
     async findAllUser(obj, body: {pageSize: number, pageNumber: number, roleId: number, userName: string}, context) {
+        console.log('开始查找');
         result = await this.userService.findAllUser(body.pageSize, body.pageNumber, body.roleId, body.userName);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
         return result;

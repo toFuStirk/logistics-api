@@ -34,6 +34,7 @@ async function bootstrap() {
             return next();
         }
         passport.authenticate('jwt', (err, user, info) => {
+            console.log('user', user, 'info', info);
             if (info && info instanceof TokenExpiredError) {
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify({ code: 401, message: 'token过期，请重新登录'}));

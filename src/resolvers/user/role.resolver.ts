@@ -25,4 +25,9 @@ export class RoleResolver {
         result = await this.roleService.deleteRole(body.id);
         return result;
     }
+    @Mutation('setPermissions')
+    async setPermissions(obj, body: {id: number, permissionIds: number[]}) {
+        result = await this.roleService.setPermissions(body.id, body.permissionIds);
+        return result;
+    }
 }

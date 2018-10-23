@@ -1,9 +1,11 @@
-import {Body, Controller, Get, Inject, Post, Res} from '@nestjs/common';
+import {Body, Controller, Get, Inject, Post, Res, UseGuards} from '@nestjs/common';
 import {SystemService} from '../service/system/system.service';
 import {CreatePlatformInterface, ExchangeRateInterface} from '../interfaces/system/system.interface';
 import {Permission, Resource} from '../decorator';
+import {PermissionGuard} from '../guards/user/permission.guard';
 let result;
 @Resource({name: '系统设置', identify: 'system'})
+@UseGuards(PermissionGuard)
 @Controller('system')
 export class SystemController {
     constructor(
@@ -32,18 +34,21 @@ export class SystemController {
         return;
     }
     @Post('/createExchangeRate')
-    async createExchangeRate(@Body() body: {createExchangeRate: ExchangeRateInterface}, @Res() res){
+    @Permission({name: '创建汇率', identify: 'system:createExchangeRate ', action: 'create'})
+    async createExchangeRate(@Body() body: {createExchangeRate: ExchangeRateInterface}, @Res() res) {
         result = await this.systemService.createExchangeRateEntity(body.createExchangeRate);
         res.send(result);
         return;
     }
     @Post('/updateExchangeRate')
+    @Permission({name: '修改汇率', identify: 'system:updateExchangeRate ', action: 'update'})
     async updateExchangeRate(@Body() body: {updateExchangeRate: ExchangeRateInterface}, @Res() res) {
         result = await this.systemService.updateExchangeRateEntity(body.updateExchangeRate);
         res.send(result);
         return;
     }
     @Post('/findAllRates')
+    @Permission({name: '查找所有汇率', identify: 'system:findAllRates ', action: 'find'})
     async findAllRates(@Body() body: {currencyName: string}, @Res() res) {
         result = await this.systemService.findAllRates(body.currencyName);
         res.send(result);

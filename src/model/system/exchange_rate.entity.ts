@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from 'typeorm';
 /* 汇率表 */
 @Entity('exchange_rate_tabs')
 export class ExchangeRateEntity {

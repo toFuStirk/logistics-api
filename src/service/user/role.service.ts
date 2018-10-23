@@ -1,13 +1,15 @@
-import {Inject, Injectable} from '@nestjs/common';
+import {HttpException, Inject, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {RoleEntity} from '../../model/user/role.entity';
 import {Repository} from 'typeorm';
 import {EntityCheckService} from './entity.check.service';
+import {PermissionEntity} from '../../model/user/permission.entity';
 
 @Injectable()
 export class RoleService {
     constructor (
         @InjectRepository(RoleEntity) private readonly roleRepo: Repository<RoleEntity>,
+        @InjectRepository(PermissionEntity) private readonly permissionRepo: Repository<PermissionEntity>,
         @Inject(EntityCheckService) private checkService: EntityCheckService
     ) {}
     /**
@@ -35,6 +37,23 @@ export class RoleService {
             await this.checkService.checkNameExist(RoleEntity, name);
         }
         role.name = name;
+        await this.roleRepo.save(role);
+    }
+    async setPermissions(id, permissionIds) {
+        const role = await this.roleRepo.findOne(id);
+        if (!role) {
+            throw new HttpException(`The role id of ${id.toString()} does not exist`, 404);
+        }
+        const permissionArr = await this.permissionRepo.findByIds(permissionIds);
+        permissionIds.forEach(permissionId => {
+            const exist = permissionArr.find(permission => {
+                return permission.id === permissionId;
+            });
+            if (!exist) {
+                throw new HttpException(`The permission id of ${permissionId.toString()} does not exist`,  404);
+            }
+        });
+        role.permissions = permissionArr;
         await this.roleRepo.save(role);
     }
 

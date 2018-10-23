@@ -25,7 +25,7 @@ import {EntityCheckService} from '../service/user/entity.check.service';
 import {UserController} from '../controllers/user.controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import {JwtStrategy} from '../service/user/auth.strategy';
+import {JwtStrategy} from '../guards/user/auth.strategy';
 import {In, Not, Repository} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import {ModulesContainer} from '@nestjs/core/injector';
