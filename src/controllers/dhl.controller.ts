@@ -1,14 +1,27 @@
-import {Body, Controller, FileInterceptor, Get, Inject, Post, Res, UploadedFile, UseInterceptors} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    FileInterceptor,
+    Get,
+    Inject,
+    Post,
+    Res,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors
+} from '@nestjs/common';
 import {LabelService} from '../service/dhl/label.service';
 import {DhlLabelReqBody} from '../interfaces/dhl/dhl.label.req.body';
 import {Permission, Resource} from '../decorator';
 import {LogisticService} from '../service/dhl/logistic.service';
 import {LogistisInterfaceInput} from '../interfaces/user/logistis.interface';
-import {ShippingService} from "../service/dhl/shipping.service";
-import {PagerUtil} from "../utils/pager.util";
+import {ShippingService} from '../service/dhl/shipping.service';
+import {PagerUtil} from '../utils/pager.util';
+import {PermissionGuard} from '../guards/user/permission.guard';
 const xlsx = require('xlsx');
 let result;
-@Resource({name: 'dhl物流管理', identify: 'dhl'})
+@Resource({name: '物流管理', identify: 'logistic:manage'})
+// @UseGuards(PermissionGuard)
 @Controller('api/dhl')
 export class DhlController {
     constructor (
@@ -67,6 +80,7 @@ export class DhlController {
         return;
     }
     @Get('/findAllShippingInformation')
+    @Permission({name: '查找发货记录', identify: 'logistic:findAllShippingInformation', action: 'find'})
     async findAllShippingInformation(@Body() body: {pageNumber: number, pageSize: number, companyType: string, username: string}, @Res() res){
         result = await this.manageService.findAllShippingInformation(body.pageNumber, body.pageSize, body.companyType, body.username);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
