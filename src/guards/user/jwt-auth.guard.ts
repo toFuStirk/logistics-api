@@ -25,10 +25,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
                 }
             });
         }
-        console.log('prototype', context.getClass().prototype);
-        console.log('name', context.getHandler().name);
         const handlerPerm = <PermissionEntity>Reflect.getMetadata(PERMISSION_DEFINITION, context.getClass().prototype, context.getHandler().name);
-        console.log('handlerPerm', handlerPerm);
         if (handlerPerm && !userPerm.includes(handlerPerm.identify)) {
             return false;
         }

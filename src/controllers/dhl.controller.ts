@@ -1,12 +1,15 @@
 import {Controller, FileInterceptor, Post, UploadedFile, UseInterceptors} from '@nestjs/common';
 import {LabelService} from '../service/dhl/label.service';
 import {DhlLabelReqBody} from '../interfaces/dhl/dhl.label.req.body';
+import {Permission, Resource} from '../decorator';
 const xlsx = require('xlsx');
+@Resource({name: 'dhl物流管理', identify: 'dhl'})
 @Controller('dhl')
 export class DhlController {
     constructor (private readonly dhlLabelService: LabelService) {}
     // 上传文件
     @Post('/upload')
+   // @Permission({name: 'upload', identify: 'dhl:upload', action: 'find'})
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file) {
         const result = [];

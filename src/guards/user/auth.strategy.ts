@@ -1,12 +1,8 @@
-import {Injectable, UnauthorizedException, Inject, ExecutionContext, Controller} from '@nestjs/common';
+import {Injectable, UnauthorizedException, Inject} from '@nestjs/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../../service/user/auth.service';
 import { User } from '../../model/user/users.entity';
-import {PermissionEntity} from "../../model/user/permission.entity";
-import {PERMISSION_DEFINITION} from "../../decorator/index";
-import {SystemController} from "../../controllers/system.controller";
-import {ExecutionContextHost} from "@nestjs/core/helpers/execution-context.host";
 
 /*
 认证策略，这里使用的是jsonwebtoken
@@ -29,31 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       passReqToCallback: true,
     });
   }
-  /*
-  passport直接使用的是这个验证函数，这个验证函数里面调用了AuthService里的验证函数
-  这个函数被设置到JwtStrategy实例的_verify属性上
-  done方法为，通过done方法，退出JwtStrategy实例的authenticate方法
-  var verified = function (err, user, info) {
-    有错误抛出错误
-    if (err) {
-        return self.error(err);
-    } else if (!user) {
-        有效载荷不存在，抛出信息
-        return self.fail(info);
-    } else {
-        成功时，有效载荷与信息一起抛出
-        return self.success(user, info);
-    }
-};
-  */
-    async canActivate(context: ExecutionContextHost): Promise<boolean> {
-      console.log('上下文');
-      return true;
-    }
-  async validate(req: any , payload: User, context: ExecutionContext) {
-     console.log('路由验证1', req.url.substring(1));
-     console.log('路由验证2', req.baseUrl.substring(1));
- //   console.log('上下文', context);
+  async validate(payload: User) {
     /* 调用AuthService里的验证函数 */
     const user = await this.authService.validatePassport(JSON.parse(JSON.stringify(payload)).loginName);
     /* 如果不存在，即返回false，则将异常传递给回调 */

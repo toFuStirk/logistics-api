@@ -1,4 +1,4 @@
-import {Body, Controller, Inject, Post, Req, Res} from '@nestjs/common';
+import {Body, Controller, Inject, Post, Req, Res, UseGuards} from '@nestjs/common';
 import {UserService} from '../service/user/user.service';
 import {RoleService} from '../service/user/role.service';
 import {OrganizationService} from '../service/user/organization.service';
@@ -10,10 +10,12 @@ import {HttpUtil} from '../utils/http.util';
 import {ApiConfigEntity} from '../model/user/api.config.entity';
 import {Repository} from 'typeorm';
 import {UserJDLocalInfoResBody} from '../interfaces/user/local.info.interface';
+import {PermissionGuard} from '../guards/user/permission.guard';
 const useragent = require('useragent');
 const api = require('./../config/user/api.config');
 let result;
 @Resource({name: '用户管理', identify: 'user'})
+@UseGuards(PermissionGuard)
 @Controller('user')
 export class UserController {
     constructor(
@@ -24,7 +26,7 @@ export class UserController {
         @Inject(PagerUtil) private readonly pagerUtil: PagerUtil,
         @Inject(HttpUtil) private readonly httpUtil: HttpUtil
     ) {}
-    @Permission({name: '创建用户', identify: 'user/createUser', action: 'create'})
+    @Permission({name: '创建用户', identify: 'user:createUser', action: 'create'})
     @Post('/createUser')
     async createUser(@Body() createUserInput: CreateUserInput, @Res() res) {
         const result = await this.userService.createUser(createUserInput);
@@ -56,7 +58,7 @@ export class UserController {
         res.send(result);
         return;
     }
-    @Permission({name: '删除用户', identify: 'user/deleteUser', action: 'delete'})
+    @Permission({name: '删除用户', identify: 'user:deleteUser', action: 'delete'})
     @Post('/deleteUser')
     async deleteUser(@Body() body: {id: number},  @Res() res) {
         if (!body.id) {
@@ -67,7 +69,7 @@ export class UserController {
         res.send(result);
         return;
     }
-    @Permission({name: '修改用户', identify: 'user/updateUserInfo', action: 'update'})
+    @Permission({name: '修改用户', identify: 'user:updateUserInfo', action: 'update'})
     @Post('/updateUserInfo')
     async updateUserInfo(@Body() body: {id: number, updateUserInput: UpdateUserInput}, @Res() res) {
         if (!body.id || !body.updateUserInput) {
@@ -78,7 +80,7 @@ export class UserController {
         res.send(result);
         return;
     }
-    @Permission({name: '查询所有用户', identify: 'user/findAllUser', action: 'find'})
+    @Permission({name: '查询所有用户', identify: 'user:findAllUser', action: 'find'})
     @Post('/findAllUser')
     async findAllUser(@Body() body: {pageSize: number, pageNumber: number, roleId: number, userName: string}, @Res() res) {
         if (!body.pageSize || !body.pageNumber) {
@@ -90,7 +92,7 @@ export class UserController {
         res.send(result);
         return;
     }
-    @Permission({name: '查询用户登录日志', identify: 'user/findUserLoginLogs', action: 'find'})
+    @Permission({name: '查询用户登录日志', identify: 'user:findUserLoginLogs', action: 'find'})
     @Post('/findUserLoginLogs')
     async findUserLoginLogs(@Body() body:
                                 {pageNumber: number, pageSize: number, username: string, keywords?: string, startTime?: Date, endTime?: Date},
