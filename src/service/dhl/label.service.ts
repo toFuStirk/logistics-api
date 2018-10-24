@@ -112,4 +112,13 @@ export class LabelService {
     async shippingLabelEdit(_body: DhlLabelReqBody) {
         const shippment = await this.labelRepository.findOne();
     }
+    async findAllLabels(pageNumber: number, pageSize: number) {
+        const result = await this.labelRepository.findAndCount({
+            relations: ['shipmentItems'],
+            order: { createDate: 'DESC'},
+            skip: pageSize * (pageNumber - 1),
+            take: pageSize
+        });
+        return {code: 200, message: '查找成功', orders: result[0], totalItems: result[1]};
+    }
 }

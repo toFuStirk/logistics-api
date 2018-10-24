@@ -26,10 +26,9 @@ export class User {
     username: string;
 
     @Column({
-        unique: true,
         nullable: true
     })
-    mobile: string;
+    nickname: string;
 
     @Column()
     password: string;

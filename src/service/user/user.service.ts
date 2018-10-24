@@ -129,7 +129,7 @@ export class UserService {
             .leftJoin('infoGroups.role', 'role')
             .leftJoin('role.users', 'users')
             .where('users.username = :loginName', { loginName })
-            .orWhere('users.mobile = :loginName', { loginName })
+            .orWhere('users.nickname = :loginName', { loginName })
             .orderBy('infoItem.order', 'ASC')
             .getMany();
         const userInfoData = this.refactorUserData(user, infoItem);
@@ -181,11 +181,11 @@ export class UserService {
             }
             await this.userRepo.update(user.id, { username: updateUserInput.username });
         }
-        if (updateUserInput.mobile) {
-            if (await this.userRepo.findOne({ where: { mobile: updateUserInput.mobile } })) {
-                return {code: 404, message: '手机号码已存在'};
+        if (updateUserInput.nickname) {
+            if (await this.userRepo.findOne({ where: { nickname: updateUserInput.nickname } })) {
+                return {code: 404, message: '昵称已存在'};
             }
-            await this.userRepo.update(user.id, { mobile: updateUserInput.mobile });
+            await this.userRepo.update(user.id, { nickname: updateUserInput.nickname });
         }
         if (updateUserInput.password) {
             const newPassword = await this.cryptoUtil.encryptPassword(updateUserInput.password);
@@ -219,7 +219,7 @@ export class UserService {
         const userInfoData: UserInfoData = {
             userId: user.id,
             username: user.username,
-            mobile: user.mobile,
+            nickname: user.nickname,
             banned: user.banned,
             recycle: user.recycle,
             createTime: user.createTime,
@@ -301,7 +301,7 @@ export class UserService {
             .leftJoinAndSelect('user.roles', 'roles')
             .leftJoinAndSelect('roles.permissions', 'permissions')
             .where('user.username = :loginName', { loginName })
-            .orWhere('user.mobile = :loginName', { loginName })
+            .orWhere('user.nickname = :loginName', { loginName })
             .getOne();
         if (!user) {
             throw new HttpException('User does not exist', 404);

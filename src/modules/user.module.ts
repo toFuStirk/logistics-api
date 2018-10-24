@@ -1,4 +1,4 @@
-import {Global, Inject, Module, MulterModule, OnModuleInit} from '@nestjs/common';
+import {Global, Inject, Module, OnModuleInit} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {User} from '../model/user/users.entity';
 import {UserLoginLogsEntity} from '../model/user/user.login.logs.entity';
@@ -11,7 +11,6 @@ import {RoleEntity} from '../model/user/role.entity';
 import {ResourceEntity} from '../model/user/resource.entity';
 import {SystemModuleEntity} from '../model/user/system.module.entity';
 import {CryptoUtil} from '../utils/crypto.util';
-import { __ as t } from 'i18n';
 import {UserResolver} from '../resolvers/user/user.resolver';
 import {UserService} from '../service/user/user.service';
 import {AuthService} from '../service/user/auth.service';
@@ -87,7 +86,8 @@ import {ExchangeRateEntity} from '../model/system/exchange_rate.entity';
         SystemController
     ],
     exports: [
-        AuthService
+        AuthService,
+        UserService
     ]
 })
 @Global()

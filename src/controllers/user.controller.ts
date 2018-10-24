@@ -1,9 +1,24 @@
-import {Body, Controller, Inject, Post, Req, Res, UseGuards} from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Inject,
+    Param,
+    Post,
+    Req,
+    Res,
+    UseGuards
+} from '@nestjs/common';
 import {UserService} from '../service/user/user.service';
 import {RoleService} from '../service/user/role.service';
 import {OrganizationService} from '../service/user/organization.service';
 import {PagerUtil} from '../utils/pager.util';
-import {CreateUserInput, UpdateUserInput, UserLoginLogInterface} from '../interfaces/user/user.interface';
+import {
+    CreateUserInput, FindAllUser,
+    UpdateUserInput,
+    UserLogin,
+    UserLoginLogInterface, UserLogs
+} from '../interfaces/user/user.interface';
+import {ApiOperation, ApiUseTags} from '@nestjs/swagger';
 import {Permission, Resource} from '../decorator';
 import { InjectRepository } from '@nestjs/typeorm';
 import {HttpUtil} from '../utils/http.util';
@@ -16,6 +31,7 @@ const api = require('./../config/user/api.config');
 let result;
 @Resource({name: '用户管理', identify: 'user'})
 @UseGuards(PermissionGuard)
+@ApiUseTags('api/user')
 @Controller('api/user')
 export class UserController {
     constructor(
@@ -28,6 +44,7 @@ export class UserController {
     ) {}
     @Permission({name: '创建用户', identify: 'user:createUser', action: 'create'})
     @Post('/createUser')
+    @ApiOperation({title: '创建用户'})
     async createUser(@Body() createUserInput: CreateUserInput, @Res() res) {
         const result = await this.userService.createUser(createUserInput);
         res.send(result);
@@ -35,15 +52,17 @@ export class UserController {
     }
     /* 用户登录接口 */
     @Post('/login')
-    async login(@Req() req, @Body() body: {username: string, password: string}, @Res() res) {
-        if (!body.username || !body.password) {
+    @ApiOperation({title: '用户登录'})
+    async login(@Req() req, @Body() userLogin: UserLogin, @Res() res) {
+        if (!userLogin.username || !userLogin.password) {
             res.send({code: 405, message: '参数不正确'});
             return;
         }
-        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress;
+        const ip = (req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress)
+            .replace('::ffff:', '');
         const agent = useragent.parse(req.headers['user-agent']);
         const appkey = await this.apiRepo.findOne();
-        const params = { appkey: appkey.jdapikey, ip: '117.34.35.1'};
+        const params = { appkey: appkey.jdapikey, ip};
         const local: UserJDLocalInfoResBody = await this.httpUtil.dhlGet(api.default.localInfoJD, params);
         const loginLog: UserLoginLogInterface = {
             loginIp: ip,
@@ -54,35 +73,38 @@ export class UserController {
             isMobile: agent.isMobile ? '是' : '否',
             os: agent.os.family
         };
-        const result = await this.userService.login(body.username, body.password, loginLog);
+        result = await this.userService.login(userLogin.username, userLogin.password, loginLog);
         res.send(result);
         return;
     }
     @Permission({name: '删除用户', identify: 'user:deleteUser', action: 'delete'})
+    @ApiOperation({title: '删除用户'})
     @Post('/deleteUser')
-    async deleteUser(@Body() body: {id: number},  @Res() res) {
-        if (!body.id) {
+    async deleteUser(@Param('id') id: number, @Res() res) {
+        if (!id) {
             res.send({code: 405, message: '参数不正确'});
             return;
         }
-        const result = await this.userService.deleteUser(body.id);
+        const result = await this.userService.deleteUser(id);
         res.send(result);
         return;
     }
     @Permission({name: '修改用户', identify: 'user:updateUserInfo', action: 'update'})
+    @ApiOperation({title: '修改用户'})
     @Post('/updateUserInfo')
-    async updateUserInfo(@Body() body: {id: number, updateUserInput: UpdateUserInput}, @Res() res) {
-        if (!body.id || !body.updateUserInput) {
+    async updateUserInfo(@Body()  updateUserInput: UpdateUserInput, @Res() res) {
+        if (!updateUserInput.id) {
             res.send({code: 405, message: '参数不正确'});
             return;
         }
-        const result = await this.userService.updateUserInfo(body.id, body.updateUserInput);
+        const result = await this.userService.updateUserInfo(updateUserInput.id, updateUserInput);
         res.send(result);
         return;
     }
     @Permission({name: '查询所有用户', identify: 'user:findAllUser', action: 'find'})
+    @ApiOperation({title: '查询所有用户'})
     @Post('/findAllUser')
-    async findAllUser(@Body() body: {pageSize: number, pageNumber: number, roleId: number, userName: string}, @Res() res) {
+    async findAllUser(@Body() body: FindAllUser, @Res() res) {
         if (!body.pageSize || !body.pageNumber) {
             res.send({code: 405, message: '参数不正确'});
             return;
@@ -93,10 +115,9 @@ export class UserController {
         return;
     }
     @Permission({name: '查询用户登录日志', identify: 'user:findUserLoginLogs', action: 'find'})
+    @ApiOperation({title: '查询用户登录日志'})
     @Post('/findUserLoginLogs')
-    async findUserLoginLogs(@Body() body:
-                                {pageNumber: number, pageSize: number, username: string, keywords?: string, startTime?: Date, endTime?: Date},
-                            @Res() res) {
+    async findUserLoginLogs(@Body() body: UserLogs, @Res() res) {
         if (!body.pageSize || !body.pageNumber) {
             res.send({code: 405, message: '参数不正确'});
             return;

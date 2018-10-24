@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import * as passport from 'passport';
 import { TokenExpiredError } from 'jsonwebtoken';
 import { AppModule } from './app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 /**
  * 跨域问题
@@ -21,15 +22,17 @@ const cross = (req, res, next) => {
 };
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
-    /*const redisApp = await NestFactory.createMicroservice(AppModule, {
-        transport: Transport.REDIS,
-        options: {
-            url: 'redis://193.112.139.145:6868',
-        },
-        });*/
+    const options = new DocumentBuilder()
+        .setTitle('logistics')
+        .setDescription('The logistics API description')
+        .setVersion('1.0')
+        .addTag('logistics')
+        .build();
     app.use(cross);
+    const document = SwaggerModule.createDocument(app, options);
+    SwaggerModule.setup('swagger', app, document);
     app.use(['/api/user', ['/api/system']], (req, res, next) => {
-        const whiteList = ['/login', '/findUserLoginLogs'];
+        const whiteList = ['/login', '/findUserLoginLogs', '/createUser'];
         if (req.url && whiteList.includes(req.url)) {
             return next();
         }

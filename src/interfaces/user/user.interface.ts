@@ -1,14 +1,83 @@
-export interface CreateUserInput {
-    username: string;
+import {IsString, IsInt, IsDate} from 'class-validator';
+import { ApiModelProperty } from '@nestjs/swagger';
+export class InfoKVs {
+    @ApiModelProperty()
+    @IsInt()
+    readonly key: number;
+
+    @ApiModelProperty()
+    @IsString()
+    readonly value: string;
+
+    @ApiModelProperty()
+    @IsInt()
+    relationId?: number;
+}
+export class BeforeAndAfter {
+    @ApiModelProperty()
+    @IsInt()
+    before: number;
+    @ApiModelProperty()
+    @IsInt()
+    after: number;
+}
+export class PageParams {
+    @ApiModelProperty()
+    @IsInt()
+    pageSize: number;
+    @ApiModelProperty()
+    @IsInt()
+    pageNumber: number;
+}
+export class UserLogin {
+    @ApiModelProperty({description: '用户名'})
+    @IsString()
+    readonly username: string;
+
+    @ApiModelProperty({description: '密码'})
+    @IsString()
+    readonly password: string;
+}
+export class CreateUserInput {
+    @ApiModelProperty()
+    @IsString()
+    readonly username: string;
+
+    @ApiModelProperty()
+    @IsString()
     password: string;
-    infoKVs?: { key: number; value: string }[];
-    roleIds?: number[];
-    organizationIds?: number[];
+
+    @ApiModelProperty()
+    @IsString()
+    readonly nickname?: string;
+
+    @ApiModelProperty({type: InfoKVs, isArray: true})
+    readonly infoKVs?: InfoKVs[];
+
+    @ApiModelProperty({ type: Number, isArray: true })
+    readonly roleIds?: number[];
+
+    @ApiModelProperty({ type: Number, isArray: true })
+    readonly organizationIds?: number[];
+}
+export class UserLogs extends PageParams {
+    @ApiModelProperty()
+    @IsString()
+    username: string;
+    @ApiModelProperty()
+    @IsString()
+    keywords: string;
+    @ApiModelProperty()
+    @IsDate()
+    startTime: Date;
+    @ApiModelProperty()
+    @IsDate()
+    endTime: Date;
 }
 export interface UserInfoData {
     userId: number;
     username: string;
-    mobile: string;
+    nickname: string;
     banned: boolean;
     recycle: boolean;
     createTime: string;
@@ -33,24 +102,39 @@ export interface UserInfoData {
         informationDisplay: boolean;
     }[];
 }
-export interface UpdateUserInput {
+export class UpdateUserInput {
+    @ApiModelProperty()
+    @IsInt()
+    id: number;
+
+    @ApiModelProperty()
+    @IsString()
     username?: string;
-    email?: string;
-    mobile?: string;
+
+    @ApiModelProperty()
+    @IsString()
+    nickname?: string;
+
+    @ApiModelProperty()
+    @IsString()
     password?: string;
-    infoKVs?: {
-        key: number;
-        value: string;
-        relationId?: number
-    }[];
-    roleIds?: {
-        before: number;
-        after: number;
-    }[];
-    organizationIds?: {
-        before: number;
-        after: number;
-    }[];
+
+    @ApiModelProperty({type: InfoKVs, isArray: true})
+    infoKVs?: InfoKVs[];
+
+    @ApiModelProperty({type: BeforeAndAfter, isArray: true})
+    roleIds?: BeforeAndAfter[];
+
+    @ApiModelProperty({type: BeforeAndAfter, isArray: true})
+    organizationIds?: BeforeAndAfter[];
+}
+export class FindAllUser extends PageParams {
+    @ApiModelProperty()
+    @IsInt()
+    roleId: number;
+    @ApiModelProperty()
+    @IsString()
+    userName: string;
 }
 export interface UserLoginLogInterface {
     id?: number;
