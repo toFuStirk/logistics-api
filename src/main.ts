@@ -31,8 +31,8 @@ async function bootstrap() {
     app.use(cross);
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('swagger', app, document);
-    app.use(['/api/user', ['/api/system']], (req, res, next) => {
-        const whiteList = ['/login', '/findUserLoginLogs', '/createUser'];
+    app.use(['/api/user', '/api/system', '/api/dhl'], (req, res, next) => {
+        const whiteList = ['/login'];
         if (req.url && whiteList.includes(req.url)) {
             return next();
         }

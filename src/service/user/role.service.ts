@@ -78,6 +78,6 @@ export class RoleService {
      * Query all roles
      */
     async findRoles() {
-        return this.roleRepo.find();
+        return {code: 200, message: '获取成功', roles: this.roleRepo.find()};
     }
 }

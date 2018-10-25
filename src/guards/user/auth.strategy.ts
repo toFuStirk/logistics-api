@@ -2,7 +2,7 @@ import {Injectable, UnauthorizedException, Inject} from '@nestjs/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../../service/user/auth.service';
-import { User } from '../../model/user/users.entity';
+import * as jwt from 'jsonwebtoken';
 
 /*
 认证策略，这里使用的是jsonwebtoken
@@ -25,9 +25,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       passReqToCallback: true,
     });
   }
-  async validate(payload: User) {
+  async validate(payload: any) {
     /* 调用AuthService里的验证函数 */
-    const user = await this.authService.validatePassport(JSON.parse(JSON.stringify(payload)).loginName);
+      const decodedToken: string | object = jwt.verify(payload.headers.authorization.slice(7), 'secretKey');
+      const user = await this.authService.validatePassport(JSON.parse(JSON.stringify(decodedToken)).loginName);
     /* 如果不存在，即返回false，则将异常传递给回调 */
     if (!user) {
       return (new UnauthorizedException(), false);

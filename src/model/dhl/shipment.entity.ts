@@ -1,4 +1,4 @@
-import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {Label, PickupAddress, ShipmentItems, ShipperAddress} from '../../interfaces/dhl/dhl.label.req.body';
 import {ShipmentItemsEntity} from './shipment.items.entity';
 @Entity('shipment_label_tabs')
@@ -71,8 +71,9 @@ export class ShipmentEntity {
     })
     status: number;
     // 发货包裹信息
-    @OneToMany(type => ShipmentItemsEntity, items => items.shipment)
-    shipmentItems: [ShipmentItems];
+    @OneToOne(type => ShipmentItemsEntity, items => items.shipment)
+    shipmentItems: ShipmentItems;
+
     // 创建日期
     @CreateDateColumn()
     createDate: Date;

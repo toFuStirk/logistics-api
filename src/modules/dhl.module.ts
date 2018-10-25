@@ -16,10 +16,12 @@ import {DhlController} from '../controllers/dhl.controller';
 import {MulterConfigService} from '../config/multer.config.service';
 import {TrackingEntity} from '../model/dhl/tracking.entity';
 import {TrackingItemsEntity} from '../model/dhl/tracking.items.entity';
-import {LogisticService} from "../service/dhl/logistic.service";
-import {LogisticConfigEntity} from "../model/dhl/logistic.config.entity";
-import {ShippingService} from "../service/dhl/shipping.service";
-import {ShippingManageEntity} from "../model/dhl/shipping.manage.entity";
+import {LogisticService} from '../service/dhl/logistic.service';
+import {LogisticConfigEntity} from '../model/dhl/logistic.config.entity';
+import {ShippingService} from '../service/dhl/shipping.service';
+import {ShippingManageEntity} from '../model/dhl/shipping.manage.entity';
+import {UserDeliveryConfigEntity} from '../model/dhl/user_delivery.config.entity';
+import {UserDeliveryService} from '../service/dhl/user.delivery.service';
 
 @Module({
     imports: [
@@ -33,7 +35,8 @@ import {ShippingManageEntity} from "../model/dhl/shipping.manage.entity";
             ShipmentItemsEntity,
             TrackingEntity,
             LogisticConfigEntity,
-            ShippingManageEntity
+            ShippingManageEntity,
+            UserDeliveryConfigEntity,
         ])
     ],
     providers: [
@@ -46,7 +49,8 @@ import {ShippingManageEntity} from "../model/dhl/shipping.manage.entity";
         LabelResolver,
         TrackingService,
         LogisticService,
-        ShippingService
+        ShippingService,
+        UserDeliveryService
     ],
     controllers: [
         DhlController

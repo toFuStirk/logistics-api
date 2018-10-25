@@ -12,6 +12,7 @@ import {ShipmentEntity} from '../../model/dhl/shipment.entity';
 import {ShipmentItemsEntity} from '../../model/dhl/shipment.items.entity';
 import {UuidUtil} from '../../utils/uuid.util';
 import {DhlDeleteReqBody} from '../../interfaces/dhl/dhl.delete.req.body';
+import {UserDeliveryService} from './user.delivery.service';
 const dhlKey = require('../../config/dhl/key.config.json');
 const _ = require('underscore');
 @Injectable()
@@ -20,6 +21,7 @@ export class LabelService {
         @InjectRepository(TokenEntity) private readonly tokenRepository: Repository<TokenEntity>,
         @InjectRepository(ShipmentEntity) private readonly labelRepository: Repository<ShipmentEntity>,
         @InjectRepository(ShipmentItemsEntity) private readonly itemsRepository: Repository<ShipmentItemsEntity>,
+        @Inject(UserDeliveryService) private readonly addressService: UserDeliveryService,
         @Inject(HttpUtil) private readonly httpUtil: HttpUtil,
         @Inject(UuidUtil) private readonly uuidUtil: UuidUtil
     ) {}
@@ -29,29 +31,29 @@ export class LabelService {
      * @param _body
      * @constructor
      */
-    async LabelTheDelivery(_body: DhlLabelReqBody) {
+    async LabelTheDelivery(userId: number, shipmentItems: ShipmentItems) {
+        const pickupAddress = await this.addressService.findOneDeliveryInformation(userId);
+        if (!pickupAddress) return {code: 404, message: '当前用户没有配置发货信息'};
+        console.log('进行便利');
+        shipmentItems.shipmentNo = `MYBRU${await this.uuidUtil.uuids(14, 10)}`;
         // 获取所有shipmentId
-       const shipmentIdArray: string[] = [];
-        _body.shipmentItems.forEach((key, value) => {
-            shipmentIdArray.push(key.shipmentID);
-        });
         // 判断shipmentId是否重复
-        const count =  await this.itemsRepository.count({shipmentID: In(shipmentIdArray)});
+        const count =  await this.itemsRepository.count({shipmentID: shipmentItems.shipmentID});
         if (count > 0) {
             throw new HttpException(`${t('ShipmentId already exist')}`, 404);
         }
-        const label = await this.labelRepository.save(await this.labelRepository.create({
-            id: undefined,
-            pickupAddress: _body.pickupAddress,
-            label: _body.label,
-            shipperAddress: _body.shipperAddress,
+        await this.labelRepository.save(await this.labelRepository.create({
+            pickupAddress,
+            label: {
+                layout: '4x1',
+                pageSize: '14',
+                format: 'PNG'
+            },
+            shipperAddress: pickupAddress,
+            shipmentItems
         }));
-        for (const t in _body.shipmentItems) {
-            _body.shipmentItems[t].parentId = label.id;
-            _body.shipmentItems[t].shipmentNo = `MYBRU${await  this.uuidUtil.uuids(14, 10)}`;
-            console.log('长度', _body.shipmentItems[t].shipmentNo);
-        }
-        await this.itemsRepository.save(_body.shipmentItems);
+        console.log('插入成功');
+        // await this.itemsRepository.save(_body.shipmentItems);
     }
 
     /**

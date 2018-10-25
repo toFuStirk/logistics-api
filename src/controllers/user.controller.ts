@@ -1,6 +1,6 @@
 import {
     Body,
-    Controller,
+    Controller, Get,
     Inject,
     Param,
     Post,
@@ -45,7 +45,7 @@ export class UserController {
     @Permission({name: '创建用户', identify: 'user:createUser', action: 'create'})
     @Post('/createUser')
     @ApiOperation({title: '创建用户'})
-    async createUser(@Body() createUserInput: CreateUserInput, @Res() res) {
+    async createUser(@Req() req, @Body() createUserInput: CreateUserInput, @Res() res) {
         const result = await this.userService.createUser(createUserInput);
         res.send(result);
         return;
@@ -117,7 +117,7 @@ export class UserController {
     @Permission({name: '查询用户登录日志', identify: 'user:findUserLoginLogs', action: 'find'})
     @ApiOperation({title: '查询用户登录日志'})
     @Post('/findUserLoginLogs')
-    async findUserLoginLogs(@Body() body: UserLogs, @Res() res) {
+    async findUserLoginLogs(@Req() req, @Body() body: UserLogs, @Res() res) {
         if (!body.pageSize || !body.pageNumber) {
             res.send({code: 405, message: '参数不正确'});
             return;
@@ -127,6 +127,22 @@ export class UserController {
         );
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
         res.send(result);
+        return;
+    }
+    @Permission({name: '获取所有用户角色', identify: 'user:findAllRoles', action: 'find'})
+    @ApiOperation({title: '获取所有用户角色'})
+    @Get('/findAllRoles')
+    async findAllRoles(@Res() res) {
+        result = await this.roleService.findRoles();
+        res.send(result);
+        return;
+    }
+    @Permission({name: '获取所有用户组织', identify: 'user:findAllOrganizations', action: 'find'})
+    @ApiOperation({title: '获取所有用户组织'})
+    @Get('/findAllOrganizations')
+    async findAllOrganizations(@Res() res) {
+        result = await this.organizationService.findAllTrees();
+        res.send({code: 200, message: '获取成功', organizations: result});
         return;
     }
  }

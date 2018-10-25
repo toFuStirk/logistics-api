@@ -1,4 +1,4 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 import {
     ConsigneeAddress,
     PickupAddress, ShipmentContents,
@@ -9,8 +9,10 @@ import {ShipmentEntity} from './shipment.entity';
 
 @Entity('shipment_items_tab')
 export class ShipmentItemsEntity {
+    @PrimaryGeneratedColumn()
+    id: number;
     // 生成唯一单号
-    @PrimaryColumn()
+    @Column()
     shipmentNo: string;
     // 发货号码（物流商流水号）
     @Column({
@@ -189,21 +191,13 @@ export class ShipmentItemsEntity {
         default: 0
     })
     parcelStatus: number;
-
-    // 父级id
-    @Column({
-        name: 'parentId',
-        nullable: true
-    })
-    parentId: number;
     // 父级
-    @ManyToOne(type => ShipmentEntity, parent => parent.shipmentItems, {
+    @OneToOne(type => ShipmentEntity, parent => parent.shipmentItems, {
         cascade: true,
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
         lazy: false,
         eager: false
     })
-    @JoinColumn({name: 'parentId', referencedColumnName: 'id'})
     shipment: ShipmentEntity;
 }
