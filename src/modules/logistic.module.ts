@@ -1,9 +1,9 @@
 import {Module, MulterModule, OnModuleInit} from '@nestjs/common';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {TokenEntity} from '../model/dhl/token.entity';
-import {ShipmentEntity} from '../model/dhl/shipment.entity';
-import {ShipmentItemsEntity} from '../model/dhl/shipment.items.entity';
-import {TokenService} from '../service/dhl/token.service';
+import {TokenEntity} from '../model/logistic/token.entity';
+import {LabelShipmentEntity} from '../model/logistic/shipment.entity';
+import {ShipmentItemsEntity} from '../model/logistic/shipment.items.entity';
+import {TokenService} from '../service/logistic/token.service';
 import {TokenResolver} from '../resolvers/dhl/token.resolver';
 import {LabelService} from '../service/dhl/label.service';
 import {LabelResolver} from '../resolvers/dhl/label.resolver';
@@ -12,16 +12,17 @@ import {MetadataScanner} from '@nestjs/core/metadata-scanner';
 import {PagerUtil} from '../utils/pager.util';
 import {HttpUtil} from '../utils/http.util';
 import {UuidUtil} from '../utils/uuid.util';
-import {DhlController} from '../controllers/dhl.controller';
+import {LogisticController} from '../controllers/logistic.controller';
 import {MulterConfigService} from '../config/multer.config.service';
-import {TrackingEntity} from '../model/dhl/tracking.entity';
-import {TrackingItemsEntity} from '../model/dhl/tracking.items.entity';
-import {LogisticService} from '../service/dhl/logistic.service';
-import {LogisticConfigEntity} from '../model/dhl/logistic.config.entity';
-import {ShippingService} from '../service/dhl/shipping.service';
-import {ShippingManageEntity} from '../model/dhl/shipping.manage.entity';
-import {UserDeliveryConfigEntity} from '../model/dhl/user_delivery.config.entity';
-import {UserDeliveryService} from '../service/dhl/user.delivery.service';
+import {TrackingEntity} from '../model/logistic/tracking.entity';
+import {TrackingItemsEntity} from '../model/logistic/tracking.items.entity';
+import {LogisticConfigEntity} from '../model/logistic/logistic.config.entity';
+import {ShippingService} from '../service/logistic/shipping.service';
+import {ShippingManageEntity} from '../model/logistic/shipping.manage.entity';
+import {UserDeliveryConfigEntity} from '../model/logistic/user_delivery.config.entity';
+import {UserDeliveryService} from '../service/logistic/user.delivery.service';
+import {LogisticsTypeService} from '../service/logistic/logistics.type.service';
+import {OrderService} from '../service/logistic/order.service';
 
 @Module({
     imports: [
@@ -29,34 +30,35 @@ import {UserDeliveryService} from '../service/dhl/user.delivery.service';
             useClass: MulterConfigService
         }),
         TypeOrmModule.forFeature([
-            TrackingItemsEntity,
             TokenEntity,
-            ShipmentEntity,
-            ShipmentItemsEntity,
             TrackingEntity,
+            TrackingItemsEntity,
+            LabelShipmentEntity,
+            ShipmentItemsEntity,
             LogisticConfigEntity,
             ShippingManageEntity,
             UserDeliveryConfigEntity,
         ])
     ],
     providers: [
-        PagerUtil,
         HttpUtil,
         UuidUtil,
+        PagerUtil,
+        OrderService,
         TokenService,
         TokenResolver,
         LabelService,
         LabelResolver,
         TrackingService,
-        LogisticService,
         ShippingService,
-        UserDeliveryService
+        UserDeliveryService,
+        LogisticsTypeService,
     ],
     controllers: [
-        DhlController
+        LogisticController
     ]
 })
-export class DhlModule implements OnModuleInit {
+export class LogisticModule implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner;
     constructor(private readonly tokenService: TokenService) {
         this.metadataScanner = new MetadataScanner();
@@ -67,7 +69,7 @@ export class DhlModule implements OnModuleInit {
         //  每天12点定时刷新token
         const j = schedule.scheduleJob('0 0 0 */0 * *', function (y) {
             // 刷新token
-            y.refreshToken();
+            y.refreshToken('DHL');
         }.bind(undefined, this.tokenService));
         // j.cancel();
     }

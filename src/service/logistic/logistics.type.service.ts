@@ -1,15 +1,19 @@
 import {HttpException, Injectable} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
-import {LogisticConfigEntity} from '../../model/dhl/logistic.config.entity';
+import {LogisticConfigEntity} from '../../model/logistic/logistic.config.entity';
 import {Not, Repository} from 'typeorm';
 import {LogistisInterfaceInput} from '../../interfaces/user/logistis.interface';
 
 @Injectable()
-export class LogisticService {
+export class LogisticsTypeService {
     constructor(
         @InjectRepository(LogisticConfigEntity) private logisticRepo: Repository<LogisticConfigEntity>,
     ) {}
-    /* 创建物流供应商基本信息 */
+
+    /**
+     * 创建物流供应商基本信息
+     * @param createLogisticInput
+     */
     async createLogisticConfigEntity(createLogisticInput: LogistisInterfaceInput) {
         const logistic = await this.logisticRepo.count({
             logisticsProviderName: createLogisticInput.logisticsProviderName
@@ -24,7 +28,11 @@ export class LogisticService {
         }
         return {code: 200, message: '创建成功'};
     }
-    /* 修改物流供应商基本信息 */
+
+    /**
+     * 修改物流供应商基本信息
+     * @param updateLogisticInput
+     */
     async updateLogisticConfigEntity(updateLogisticInput: LogistisInterfaceInput) {
         const  logistic = await this.logisticRepo.findOne(updateLogisticInput.id);
         if (!logistic) {
@@ -44,11 +52,23 @@ export class LogisticService {
         }
         return {code: 200, message: '修改成功'};
     }
-    /* 查找所有物流供应商信息 */
+
+    /**
+     * 查找所有物流供应商信息
+     * @param logisticsProviderName
+     */
     async findAllLogistics(logisticsProviderName?: string) {
         const logistics = await this.logisticRepo.find({
             logisticsProviderName: `%${logisticsProviderName ? logisticsProviderName : ''}%`
         });
         return {code: 200, message: '查找成功', logistics};
+    }
+
+    /**
+     * 根据名称查找供应商配置信息
+     * @param name
+     */
+    async findLogisticConfigByName(name: string): Promise<LogisticConfigEntity | undefined> {
+        return await this.logisticRepo.findOne({logisticsProviderName: name});
     }
 }

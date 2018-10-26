@@ -269,7 +269,11 @@ export class UserService {
         const result = await this.findUserInfoById(users[0].map(user => user.id));
         return {code: 200, message: '查找成功', totalItems: users[1], users: result};
     }
-    /* 查询用户信息组*/
+
+    /**
+     * 查询用户信息组
+     * @param id
+     */
     async findUserInfoById(id: number | number[]): Promise<UserInfoData | UserInfoData[]> {
         const userQb = this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
@@ -295,7 +299,11 @@ export class UserService {
             return this.refactorUserData(user, infoItem);
         }
     }
-    /* 查询当前用户角色和权限*/
+
+    /**
+     * 查询当前用户角色和权限
+     * @param loginName
+     */
     async findOneWithRolesAndPermissions(loginName) {
         const user = await this.userRepo.createQueryBuilder('user')
             .leftJoinAndSelect('user.roles', 'roles')
@@ -308,7 +316,16 @@ export class UserService {
         }
         return user;
     }
-    /* 查询系统登录日志 */
+
+    /**
+     * 查询系统登录日志
+     * @param pageNumber
+     * @param pageSize
+     * @param username
+     * @param keywords
+     * @param startTime
+     * @param endTime
+     */
     async findUserLoginLogs(pageNumber: number, pageSize: number, username?: string, keywords?: string, startTime?: Date, endTime?: Date) {
         const logs = await this.loginLogRepo.findAndCount({
             where: {

@@ -4,13 +4,19 @@ import {Column, Entity, PrimaryGeneratedColumn} from 'typeorm';
 export class TokenEntity {
     @PrimaryGeneratedColumn()
     id: number;
-
     // 账户
     @Column({
         name: 'clientId',
         length: 30
     })
     clientId: string;
+    // 公司类型
+    @Column({
+        name: 'companyType',
+        length: 30,
+        nullable: true
+    })
+    companyType: string;
     // 生成token
     @Column({
         name: 'token',
@@ -28,5 +34,4 @@ export class TokenEntity {
         name: 'createAt',
     })
     createAt: Date;
-
 }

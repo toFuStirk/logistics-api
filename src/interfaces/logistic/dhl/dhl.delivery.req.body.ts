@@ -1,6 +1,6 @@
 import {IsString, IsInt} from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
-import {PageParams} from '../user/user.interface';
+import {PageParams} from '../../user/user.interface';
 export class DhlDeliveryReqBody {
     // 用户id
     @ApiModelProperty({description: '用户id', required: false})

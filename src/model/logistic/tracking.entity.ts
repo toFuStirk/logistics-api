@@ -1,5 +1,5 @@
 import {Column, Entity, OneToMany, PrimaryGeneratedColumn} from 'typeorm';
-import {Destination, ServiceCode} from '../../interfaces/dhl/dhl.tracking.res.body';
+import {Destination, ServiceCode} from '../../interfaces/logistic/dhl/dhl.tracking.res.body';
 import {TrackingItemsEntity} from './tracking.items.entity';
 
 @Entity('dhl_track_tabs')

@@ -1,8 +1,8 @@
 import {Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {Label, PickupAddress, ShipmentItems, ShipperAddress} from '../../interfaces/dhl/dhl.label.req.body';
+import {Label, PickupAddress, ShipmentItems, ShipperAddress} from '../../interfaces/logistic/dhl/dhl.label.req.body';
 import {ShipmentItemsEntity} from './shipment.items.entity';
 @Entity('shipment_label_tabs')
-export class ShipmentEntity {
+export class LabelShipmentEntity {
     // 自增id
     @PrimaryGeneratedColumn()
     id: number;
@@ -72,7 +72,7 @@ export class ShipmentEntity {
     status: number;
     // 发货包裹信息
     @OneToOne(type => ShipmentItemsEntity, items => items.shipment)
-    shipmentItems: ShipmentItems;
+    shipmentItem: ShipmentItemsEntity;
 
     // 创建日期
     @CreateDateColumn()

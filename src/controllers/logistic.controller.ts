@@ -10,35 +10,35 @@ import {
     UseGuards,
     UseInterceptors
 } from '@nestjs/common';
-import {LabelService} from '../service/dhl/label.service';
-import {DhlLabelReqBody, ShipmentItems} from '../interfaces/dhl/dhl.label.req.body';
+import {ShipmentItems} from '../interfaces/logistic/dhl/dhl.label.req.body';
 import {Permission, Resource} from '../decorator';
-import {LogisticService} from '../service/dhl/logistic.service';
 import {LogisticsConfig, LogistisInterfaceInput} from '../interfaces/user/logistis.interface';
-import {ShippingService} from '../service/dhl/shipping.service';
+import {ShippingService} from '../service/logistic/shipping.service';
 import {ApiOperation, ApiUseTags} from '@nestjs/swagger';
 import {PagerUtil} from '../utils/pager.util';
 import {PermissionGuard} from '../guards/user/permission.guard';
 import {PageParams} from '../interfaces/user/user.interface';
-import {DeliveryParams, DeliveryParamUserId, DhlDeliveryReqBody} from '../interfaces/dhl/dhl.delivery.req.body';
-import {UserDeliveryService} from '../service/dhl/user.delivery.service';
+import {DeliveryParams, DeliveryParamUserId, DhlDeliveryReqBody} from '../interfaces/logistic/dhl/dhl.delivery.req.body';
+import {UserDeliveryService} from '../service/logistic/user.delivery.service';
+import {LogisticsTypeService} from '../service/logistic/logistics.type.service';
+import {OrderService} from '../service/logistic/order.service';
 const xlsx = require('xlsx');
 let result;
 @Resource({name: '物流管理', identify: 'logistic:manage'})
 @UseGuards(PermissionGuard)
-@ApiUseTags('api/dhl')
-@Controller('api/dhl')
-export class DhlController {
+@ApiUseTags('api/logistic')
+@Controller('api/logistic')
+export class LogisticController {
     constructor (
-        @Inject(LabelService) private readonly dhlLabelService: LabelService,
-        @Inject(LogisticService) private readonly logisticService: LogisticService,
+        @Inject(OrderService) private readonly orderService: OrderService,
+        @Inject(LogisticsTypeService) private readonly logisticService: LogisticsTypeService,
         @Inject(ShippingService) private readonly manageService: ShippingService,
         @Inject(UserDeliveryService) private readonly deliveryService: UserDeliveryService,
         @Inject(PagerUtil) private readonly pagerUtil: PagerUtil
     ) {}
     // 上传文件
     @Post('/upload')
-    @Permission({name: '文件上传', identify: 'dhl:upload', action: 'find'})
+    @Permission({name: '文件上传', identify: 'logistic:upload', action: 'find'})
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@Req() req, @UploadedFile() file) {
         const result = [];
@@ -51,6 +51,7 @@ export class DhlController {
                let map = new Map();
                map = objToStrMap(sheet);
                const items: ShipmentItems = {
+                   id: undefined,
                    shipmentID: map.get('Shipment Order ID'),
                    packageDesc: map.get('Shipment Description'),
                    productCode: map.get('Shipping Service Code'),
@@ -67,16 +68,19 @@ export class DhlController {
                    totalWeightUOM: 'g',
                    currency: map.get('Currency Code'),
                    totalValue: map.get('Total Declared Value'),
-                   codValue: map.get('Is COD') && map.get('Is COD') === 'Y' ? map.get('Cash on Delivery Value') : undefined
+                   codValue: map.get('Is COD') && map.get('Is COD') === 'Y' ? map.get('Cash on Delivery Value') : undefined,
+                   shipmentNo: undefined
                };
                arrays.push(items);
            });
         });
-        console.log('数组长度', arrays.length);
-        arrays.map((item) => {
-             this.dhlLabelService.LabelTheDelivery(req.user.id, item);
+        const count = await this.orderService.createShipmentOrder(req.user.id, arrays);
+        await this.manageService.createShippingManageEntity({
+            userId: req.user.id,
+            username: req.user.name,
+            companyType: 'DHL',
+            uploadNumber: count && count.toString().includes('code') ? 0 : Number(count)
         });
-        // await this.dhlLabelService.LabelTheDelivery(req.user.id, arrays.reduce((item) => item));
     }
     @Permission({name: '创建物流配置项', identify: 'logistic:createLogisticConfig', action: 'create'})
     @ApiOperation({title: '创建物流配置项'})
@@ -113,17 +117,21 @@ export class DhlController {
     @Get('/findAllShippingInformation')
     @ApiOperation({title: '查找发货记录'})
     @Permission({name: '查找发货记录', identify: 'logistic:findAllShippingInformation', action: 'find'})
-    async findAllShippingInformation(@Body() body: LogisticsConfig, @Res() res) {
-        result = await this.manageService.findAllShippingInformation(body.pageNumber, body.pageSize, body.companyType, body.username);
+    async findAllShippingInformation(@Req() req, @Body() body: LogisticsConfig, @Res() res) {
+        let userId;
+        if (!body.username || req.user.roles.map((role) => role.id).includes(1, 2)) {
+            userId = req.user.id;
+        }
+        result = await this.manageService.findAllShippingInformation(body.pageNumber, body.pageSize, body.companyType, body.username, userId);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
         res.send(result);
         return;
     }
-    @Get('/findAllOrders')
+    @Post('/findAllOrders')
     @ApiOperation({title: '查找所有订单'})
     @Permission({name: '查找所有订单', identify: 'logistic:findAllOrders', action: 'find'})
     async findAllOrders(@Body() body: PageParams, @Res() res) {
-        result = await this.dhlLabelService.findAllLabels(body.pageNumber, body.pageSize);
+        result = await this.orderService.findAllOrders(body.pageNumber, body.pageSize);
         result.pagination = await this.pagerUtil.getPager(result.totalItems, body.pageNumber, body.pageSize);
         res.send(result);
         return;

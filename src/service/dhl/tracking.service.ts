@@ -1,26 +1,29 @@
 import {HttpException, Inject, Injectable} from '@nestjs/common';
 import {HttpUtil} from '../../utils/http.util';
-import dhlApi from '../../config/dhl/api.config';
+import dhlApi from '../../config/logistic/dhl.config';
 import { __ as t } from 'i18n';
 import {InjectRepository} from '@nestjs/typeorm';
-import {TokenEntity} from '../../model/dhl/token.entity';
+import {TokenEntity} from '../../model/logistic/token.entity';
 import {In, Repository} from 'typeorm';
 import * as moment from 'moment';
-import {DhlTrackingReqBody} from '../../interfaces/dhl/dhl.tracking.req.body';
-import {DhlReqHeader} from '../../interfaces/dhl/dhl.req.header';
-import {DhlDeleteReqBody} from '../../interfaces/dhl/dhl.delete.req.body';
-import {ShipmentItemsEntity} from '../../model/dhl/shipment.items.entity';
-import {DhlCloseOutReqBody} from '../../interfaces/dhl/dhl.closeOut.req.body';
-import {DhlTrackingResBody} from '../../interfaces/dhl/dhl.tracking.res.body';
-import {TrackingEntity} from '../../model/dhl/tracking.entity';
-const dhlKey = require('../../config/dhl/key.config.json');
+import {DhlTrackingReqBody} from '../../interfaces/logistic/dhl/dhl.tracking.req.body';
+import {DhlReqHeader} from '../../interfaces/logistic/dhl/dhl.req.header';
+import {DhlDeleteReqBody} from '../../interfaces/logistic/dhl/dhl.delete.req.body';
+import {ShipmentItemsEntity} from '../../model/logistic/shipment.items.entity';
+import {DhlCloseOutReqBody} from '../../interfaces/logistic/dhl/dhl.closeOut.req.body';
+import {DhlTrackingResBody} from '../../interfaces/logistic/dhl/dhl.tracking.res.body';
+import {TrackingEntity} from '../../model/logistic/tracking.entity';
+import {TokenService} from '../logistic/token.service';
+import {LogisticsTypeService} from '../logistic/logistics.type.service';
+import {LogisticConfigEntity} from '../../model/logistic/logistic.config.entity';
 const _ = require('underscore');
 @Injectable()
 export class TrackingService {
     constructor(
-        @InjectRepository(TokenEntity) private readonly tokenRepository: Repository<TokenEntity>,
         @InjectRepository(ShipmentItemsEntity) private readonly itemsRepository: Repository<ShipmentItemsEntity>,
         @InjectRepository(TrackingEntity) private readonly trackRepository: Repository<TrackingEntity>,
+        @Inject(LogisticsTypeService) private readonly typeService: LogisticsTypeService,
+        @Inject(TokenService) private readonly tokenService: TokenService,
         @Inject(HttpUtil) private readonly httpUtil: HttpUtil,
     ) {}
 
@@ -29,14 +32,18 @@ export class TrackingService {
      * @param referenceNumber
      */
     async tracking(referenceNumber: string[]) {
-        const token: TokenEntity | undefined = await this.tokenRepository.findOne();
+        const config: LogisticConfigEntity = await this.typeService.findLogisticConfigByName('DHL');
+        if (!config) {
+            throw new HttpException('供应商配置信息不存在', 404);
+        }
+        const token: TokenEntity | undefined = await this.tokenService.findTokenByTypeName(config.logisticsProviderName);
         if (!token) {
             throw new HttpException('token配置不存在', 404);
         }
         const params: DhlTrackingReqBody = {
             customerAccountId: undefined,
-            pickupAccountId: dhlKey.PICKUPAccount,
-            soldToAccountId: dhlKey.SOLDTOAccount,
+            pickupAccountId: config.PICKUPAccount,
+            soldToAccountId: config.SOLDTOAccount,
             ePODRequired: 'Y',
             trackingReferenceNumber: referenceNumber
         };
@@ -58,6 +65,14 @@ export class TrackingService {
      * @param shipmentID
      */
     async deleteOrCancelShipments(shipmentIDs: string[]) {
+        const config: LogisticConfigEntity = await this.typeService.findLogisticConfigByName('DHL');
+        if (!config) {
+            throw new HttpException('供应商配置信息不存在', 404);
+        }
+        const token: TokenEntity | undefined = await this.tokenService.findTokenByTypeName(config.logisticsProviderName);
+        if (!token) {
+            throw new HttpException('token配置不存在', 404);
+        }
         const shipments = await this.itemsRepository.find({
             where: {
                 shipmentID: In(shipmentIDs)
@@ -85,10 +100,6 @@ export class TrackingService {
             console.log('抛出异常3');
             // throw new HttpException(t('Shipment with id [%s] is not exit', noExit.toString()), 404);
         }
-        const token: TokenEntity | undefined = await this.tokenRepository.findOne();
-        if (!token) {
-            throw new HttpException('token配置不存在', 404);
-        }
         const header: DhlReqHeader = {
             messageType: 'DELETESHIPMENT',
             messageDateTime: moment(new Date()).utcOffset('+08:00').format(),
@@ -103,8 +114,8 @@ export class TrackingService {
         });
         const params: DhlDeleteReqBody = {
             customerAccountId: undefined,
-            pickupAccountId: dhlKey.PICKUPAccount,
-            soldToAccountId: dhlKey.SOLDTOAccount,
+            pickupAccountId: config.PICKUPAccount,
+            soldToAccountId: config.SOLDTOAccount,
             shipmentItems: items,
         };
         const body = {deleteShipmentReq : { hdr: header, bd: params}};
@@ -118,6 +129,14 @@ export class TrackingService {
      * @param shipmentItems
      */
     async closeOutShipments(shipmentItems: {shipmentID: string, bagID?: string} []) {
+        const config: LogisticConfigEntity = await this.typeService.findLogisticConfigByName('DHL');
+        if (!config) {
+            throw new HttpException('供应商配置信息不存在', 404);
+        }
+        const token: TokenEntity | undefined = await this.tokenService.findTokenByTypeName(config.logisticsProviderName);
+        if (!token) {
+            throw new HttpException('token配置不存在', 404);
+        }
         const shipmentIDs = shipmentItems.map((key, value) => {
             return key.shipmentID;
         });
@@ -135,10 +154,6 @@ export class TrackingService {
         if (noExit.length > 0) {
             throw new HttpException(t('Shipment with id [%s] is not exit', noExit.toString()), 404);
         }
-        const token: TokenEntity | undefined = await this.tokenRepository.findOne();
-        if (!token) {
-            throw new HttpException('token配置不存在', 404);
-        }
         const header: DhlReqHeader = {
             messageType: 'CLOSEOUT',
             messageDateTime: moment(new Date()).utcOffset('+08:00').format(),
@@ -148,8 +163,8 @@ export class TrackingService {
         };
         const params: DhlCloseOutReqBody = {
             customerAccountId: undefined,
-            pickupAccountId: dhlKey.PICKUPAccount,
-            soldToAccountId: dhlKey.SOLDTOAccount,
+            pickupAccountId: config.PICKUPAccount,
+            soldToAccountId: config.SOLDTOAccount,
             handoverID: undefined,
             generateHandover: 'Y',
             handoverMethod: 1,

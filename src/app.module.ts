@@ -4,14 +4,14 @@ import { ErrorsInterceptor } from './interceptors/errors.interceptor';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GraphqlConfig } from './config/graphql.config';
-import {DhlModule} from './modules/dhl.module';
+import {LogisticModule} from './modules/logistic.module';
 import {UserModule} from './modules/user.module';
 
 @Module({
     imports: [
         GraphQLModule.forRootAsync({useClass: GraphqlConfig}),
         TypeOrmModule.forRoot(),
-        DhlModule,
+        LogisticModule,
         UserModule.forRoot({
             authTokenWhiteList: ['login', 'getToken']
         })

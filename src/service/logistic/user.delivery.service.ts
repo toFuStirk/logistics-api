@@ -3,8 +3,8 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {HttpException, Inject, Injectable} from '@nestjs/common';
 import {UserService} from '../user/user.service';
 import {ReturnCodeInterface} from '../../interfaces/common/return.interface';
-import {DhlDeliveryReqBody} from '../../interfaces/dhl/dhl.delivery.req.body';
-import {UserDeliveryConfigEntity} from '../../model/dhl/user_delivery.config.entity';
+import {DhlDeliveryReqBody} from '../../interfaces/logistic/dhl/dhl.delivery.req.body';
+import {UserDeliveryConfigEntity} from '../../model/logistic/user_delivery.config.entity';
 
 
 @Injectable()
@@ -12,12 +12,17 @@ export class UserDeliveryService {
     constructor(
         @InjectRepository(UserDeliveryConfigEntity) private readonly deliveryRepo: Repository<UserDeliveryConfigEntity>,
         @Inject(UserService) private readonly userService: UserService
-    ) {}
-    /* 创建物流发货信息 */
+    ) {
+    }
+
+    /**
+     * 创建物流发货配置信息
+     * @param createDeliveryInfo
+     */
     async createUserDeliveryInformation(createDeliveryInfo: DhlDeliveryReqBody): Promise<ReturnCodeInterface> {
         const userInformationCount = await this.deliveryRepo.count({userId: createDeliveryInfo.userId});
         if (userInformationCount > 0) {
-            return {code: 404, message: '当前用户已有物流发货信息'};
+            return {code: 404, message: '当前用户已有物流发货配置信息'};
         }
         try {
             await this.deliveryRepo.save(this.deliveryRepo.create(createDeliveryInfo));
@@ -26,11 +31,15 @@ export class UserDeliveryService {
         }
         return {code: 200, message: '创建成功'};
     }
-    /* 修改物流发货信息 */
+
+    /**
+     * 修改物流发货配置信息
+     * @param updateDeliveryInfo
+     */
     async updateUserDeliveryInformation(updateDeliveryInfo: DhlDeliveryReqBody): Promise<ReturnCodeInterface> {
         const userInformation = await this.deliveryRepo.findOne(updateDeliveryInfo.userId);
         if (!userInformation) {
-            return {code: 404, message: '当前用户没有物流发货信息'};
+            return {code: 404, message: '当前用户没有物流发货配置信息'};
         }
         try {
             await this.deliveryRepo.update({userId: updateDeliveryInfo.userId}, updateDeliveryInfo);
@@ -39,7 +48,13 @@ export class UserDeliveryService {
         }
         return {code: 200, message: '修改成功'};
     }
-    /* 查找所有物流发货信息 */
+
+    /**
+     * 查找所有物流发货配置信息
+     * @param pageNumber
+     * @param pageSize
+     * @param username
+     */
     async findAllDeliveryInformation(pageNumber: number, pageSize: number, username: string) {
         const user = await this.userService.findOneWithRolesAndPermissions(username);
         const result = await this.deliveryRepo.findAndCount({
@@ -51,11 +66,19 @@ export class UserDeliveryService {
         });
         return {code: 200, message: '查找成功', deliveries: result[0], totalItems: result[1]};
     }
-    /* 查找指定用户物流发货信息 */
+
+    /**
+     * 查找指定用户物流发货配置信息
+     * @param userId
+     */
     async findOneDeliveryInformation(userId: number) {
         return await this.deliveryRepo.findOne({userId});
     }
-    /* 删除指定用户物流发货信息 */
+
+    /**
+     * 删除指定用户物流发货配置信息
+     * @param userId
+     */
     async deleteDeliveryInformation(userId: number): Promise<ReturnCodeInterface> {
         const userInformation = await this.deliveryRepo.findOne({userId});
         if (!userInformation) {

@@ -11,7 +11,11 @@ export class SystemService {
         @InjectRepository(PlatformEntity) private readonly platformRepo: Repository<PlatformEntity>,
         @InjectRepository(ExchangeRateEntity) private readonly rateRepo: Repository<ExchangeRateEntity>
     ) {}
-    /*添加系统设置*/
+
+    /**
+     * 添加系统设置
+     * @param createPlatform
+     */
     async createPlatformEntity(createPlatform: CreatePlatformInterface) {
         if (createPlatform.allowUserLogin && createPlatform.promptInformation) {
             return {code: 404, message: '允许用户登录不能添加提示信息'};
@@ -23,7 +27,11 @@ export class SystemService {
         }
         return {code: 200, message: '创建成功'};
     }
-    /*修改系统设置*/
+
+    /**
+     * 修改系统设置
+     * @param updatePlatform
+     */
     async updatePlatformEntity(updatePlatform: CreatePlatformInterface) {
         const platform = await this.platformRepo.findOne(updatePlatform.id);
         if (!platform) {
@@ -36,10 +44,19 @@ export class SystemService {
         }
         return {code: 200, message: '修改成功'};
     }
-    /*查询系统设置信息*/
+
+    /**
+     * 查询系统设置信息
+     * @param id
+     */
     async findPlatformEntity(id ?: number) {
         return {code: 200, message: '查找成功', platform: await this.platformRepo.findOne(id)};
     }
+
+    /**
+     * 创建汇率
+     * @param createRateInput
+     */
     async createExchangeRateEntity(createRateInput: ExchangeRateInterface) {
         const count = await this.rateRepo.count({
             currencyName: createRateInput.currencyName
@@ -52,6 +69,11 @@ export class SystemService {
         }
         return {code: 200, message: '创建成功'};
     }
+
+    /**
+     * 修改汇率
+     * @param updateRateInput
+     */
     async updateExchangeRateEntity(updateRateInput: ExchangeRateInterface) {
         const rate = await this.rateRepo.findOne(updateRateInput.id);
         if (!rate) return {code: 404, message: '当前汇率不存在'};
@@ -67,7 +89,11 @@ export class SystemService {
         }
         return {code: 200, message: '修改成功'};
     }
-    /* 查询所有汇率 */
+
+    /**
+     * 查询所有汇率
+     * @param currencyName
+     */
     async findAllRates(currencyName: string): Promise<ExchangeRateEntity [] > {
         const rates: ExchangeRateEntity [] = await this.rateRepo.find({
             currencyName: `%${currencyName ? currencyName : ''}%`

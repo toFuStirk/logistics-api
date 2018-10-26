@@ -1,11 +1,11 @@
-import {Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {
     ConsigneeAddress,
     PickupAddress, ShipmentContents,
     ShipmentPieces,
     ValueAddedServices
-} from '../../interfaces/dhl/dhl.label.req.body';
-import {ShipmentEntity} from './shipment.entity';
+} from '../../interfaces/logistic/dhl/dhl.label.req.body';
+import {LabelShipmentEntity} from './shipment.entity';
 
 @Entity('shipment_items_tab')
 export class ShipmentItemsEntity {
@@ -30,6 +30,7 @@ export class ShipmentItemsEntity {
     // 退件地址详情
     @Column({
         name: 'returnAddress',
+        nullable: true,
         type: 'json'
     })
     returnAddress: PickupAddress;
@@ -98,6 +99,12 @@ export class ShipmentItemsEntity {
         nullable: true
     })
     incoterm: string;
+    // codValue
+    @Column({
+        name: 'codValue',
+        nullable: true
+    })
+    codValue: string;
     // 包裹总价值
     @Column({
         name: 'totalValue',
@@ -169,13 +176,15 @@ export class ShipmentItemsEntity {
     // 装运。当isMult设置为“TRUE”时，这个块是必须的.整个块仅支持1.4版本及以上版本。
     @Column({
         name: 'shipmentPieces',
-        type: 'json'
+        type: 'json',
+        nullable: true
     })
     shipmentPieces: [ShipmentPieces];
     // 增值服务。
     @Column({
         name: 'valueAddedServices',
-        type: 'json'
+        type: 'json',
+        nullable: true
     })
     valueAddedServices: ValueAddedServices;
     // 包裹物品详细描述
@@ -192,12 +201,10 @@ export class ShipmentItemsEntity {
     })
     parcelStatus: number;
     // 父级
-    @OneToOne(type => ShipmentEntity, parent => parent.shipmentItems, {
+    @OneToOne(type => LabelShipmentEntity, parent => parent.shipmentItem, {
         cascade: true,
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-        lazy: false,
-        eager: false
     })
-    shipment: ShipmentEntity;
+    @JoinColumn({name: 'id'})
+    shipment: LabelShipmentEntity;
 }

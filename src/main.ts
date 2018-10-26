@@ -31,7 +31,7 @@ async function bootstrap() {
     app.use(cross);
     const document = SwaggerModule.createDocument(app, options);
     SwaggerModule.setup('swagger', app, document);
-    app.use(['/api/user', '/api/system', '/api/dhl'], (req, res, next) => {
+    app.use(['/api/user', '/api/system', '/api/logistic'], (req, res, next) => {
         const whiteList = ['/login'];
         if (req.url && whiteList.includes(req.url)) {
             return next();
@@ -51,8 +51,8 @@ async function bootstrap() {
             }
         })(req, res);
     });
-    await app.listen(3000);
+    await app.listen(3001);
     // await redisApp.listenAsync();
 }
 
-bootstrap().then(() => { console.log('Application is listening on port 3000'); });
+bootstrap().then(() => { console.log('Application is listening on port 3001'); });

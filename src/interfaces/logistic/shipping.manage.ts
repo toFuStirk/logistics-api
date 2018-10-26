@@ -1,4 +1,4 @@
-export interface DhlShippingManageInterface {
+export interface ShippingManageInterface {
     id?: number;
     companyType: string;
     userId: number;

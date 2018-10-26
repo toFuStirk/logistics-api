@@ -1,7 +1,7 @@
 import {Resolver, Mutation, Query } from '@nestjs/graphql';
 import {Inject, UploadedFile} from '@nestjs/common';
 import {LabelService} from '../../service/dhl/label.service';
-import {DhlLabelReqBody} from '../../interfaces/dhl/dhl.label.req.body';
+import {DhlLabelReqBody} from '../../interfaces/logistic/dhl/dhl.label.req.body';
 import {TrackingService} from '../../service/dhl/tracking.service';
 let result;
 @Resolver('label')
@@ -12,7 +12,7 @@ export class LabelResolver {
     ) {}
     @Mutation('LabelTheDelivery')
     async LabelTheDelivery(obj, body: {params: DhlLabelReqBody}) {
-        result = await this.labelService.LabelTheDelivery(body.params);
+       // result = await this.labelService.createLabel(body.params);
         return result;
     }
     @Query('DhlTracking')

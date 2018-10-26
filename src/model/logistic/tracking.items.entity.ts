@@ -1,5 +1,5 @@
 import {Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
-import {AddressInterface} from '../../interfaces/dhl/dhl.tracking.res.body';
+import {AddressInterface} from '../../interfaces/logistic/dhl/dhl.tracking.res.body';
 import {TrackingEntity} from './tracking.entity';
 @Entity('dhl_track_items_tab')
 export class TrackingItemsEntity {

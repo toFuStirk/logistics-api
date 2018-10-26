@@ -1,4 +1,6 @@
 // 参数未写完成， valueAddedServices， shipmentContents
+import {LabelShipmentEntity} from '../../../model/logistic/shipment.entity';
+
 export interface DhlLabelReqBody {
     customerAccountId ?: number;
     pickupAccountId ?: string;
@@ -30,6 +32,7 @@ export interface ShipperAddress extends PickupAddress {
     sendEmail: string;
 }
 export interface ShipmentItems {
+    id: number;
     consigneeAddress ?: ConsigneeAddress;
     returnAddress ?: PickupAddress;
     // 最长32位,90天之内不能重复
@@ -46,6 +49,8 @@ export interface ShipmentItems {
     height?: number;
     length?: number;
     width?: number;
+    weight?: number;
+    parcelStatus?: number;
     // 默认为null
     customerReference1?: string;
     customerReference2?: string;
@@ -73,10 +78,10 @@ export interface ShipmentItems {
     returnProductCode?: string;
     locationID?: string;
     shipmentPieces?: [ShipmentPieces];
-    valueAddedServices?: [ValueAddedServices];
+    valueAddedServices?: ValueAddedServices;
     shipmentContents?: [ShipmentContents];
-    parentId?: number;
-    shipmentNo?: string;
+    shipmentNo: string;
+    shipment ?: LabelShipmentEntity;
 }
 export interface ConsigneeAddress extends PickupAddress {
     // Consignee Identification Number
